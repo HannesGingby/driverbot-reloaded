@@ -13,8 +13,8 @@ export function login(username: string, password: string): boolean {
   mqttStore.clusterURL = clusterURL;
   mqttStore.clusterBaseURL = clusterBaseURL;
   mqttStore.port = clusterPort;
-  mqttStore.username = "username";
-  mqttStore.password = "password";
+  mqttStore.username = "replace_this";
+  mqttStore.password = "replace_this";
 
   authStore.loggedIn = true;
   authStore.username = "Hannes";

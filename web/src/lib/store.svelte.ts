@@ -50,7 +50,7 @@ interface mqttStore {
   time: Date,
   elapsedTime: number,
   clientID: string,
-  latestMqttSend?: string,
+  latestMovementSend?: string,
 }
 
 export const mqttStore = $state<mqttStore>({
@@ -64,7 +64,7 @@ export const mqttStore = $state<mqttStore>({
   time: new Date(),
   elapsedTime: 0,
   clientID: "",
-  latestMqttSend: undefined,
+  latestMovementSend: undefined,
 })
 
 export function resetMqttStore() {
@@ -80,14 +80,14 @@ export function resetMqttStore() {
   mqttStore.clientID = "";
 }
 
-interface mqttSendData {
+interface movement {
   direction?: string,
   steer?: string,
   speed?: number,
   steerAngle?: number,
 }
 
-export const mqttSendData = $state<mqttSendData>({
+export const movementData = $state<movement>({
   direction: undefined,
   steer: undefined,
   speed: undefined,

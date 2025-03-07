@@ -1,29 +1,10 @@
 import mqtt from "mqtt";
 
 import { routeToPage } from "./utils.js";
-import { authStore, mqttStore, mqttSendData } from "./store.svelte.js";
+import { authStore, mqttStore, movementData } from "./store.svelte.js";
 
 let client : any;
 let connectionTimeoutId : any;
-
-
-
-// let direction;
-// let steer;
-// let speed;
-// let steerAngle;
-
-// let userData = {
-//   "direction": direction,
-//   "steer": steer,
-//   "speed": speed,
-//   "steerAngle": steerAngle,
-// };
-
-// JSON of the user data set
-// let jsonUserData;
-
-
 
 export function connect(clusterURL: string, username: string, password: string) {
   console.log("Connecting to MQTT broker...");
@@ -78,24 +59,22 @@ export function connect(clusterURL: string, username: string, password: string) 
   });
 
   client.on('message', function (topic: string, message : any) {
-    if (topic == "espData") {
+    if (topic == "esp") {
       // Parse JSON data
       let recievedEspData = JSON.parse(message);
       console.log("ESP Data: ", recievedEspData);
     }
 
-    if (topic === "pingResponse") {
+    if (topic === "ping") {
       if (message.toString() === "1") {
         mqttStore.espConnected = true;
       }
     }
   });
 
-  client.subscribe('userData');
-  client.subscribe('espData');
-  client.subscribe('pingResponse');
-
-  // sendUserData();
+  client.subscribe('movement');
+  client.subscribe('esp');
+  client.subscribe('ping');
 
   // Set an interval for continuesly checking every 5 seconds if the ESP is connected or not, like a ping
   setInterval(() => {
@@ -117,13 +96,13 @@ export function connect(clusterURL: string, username: string, password: string) 
   }
 }
 
-export function sendMqtt() {
-  const jsonMqttSend = JSON.stringify(mqttSendData);
+export function sendMovement() {
+  const jsonMovement = JSON.stringify(movementData);
 
-  if (jsonMqttSend != mqttStore.latestMqttSend) {
-    console.log("Sending MQTT user data:   " + jsonMqttSend);
-    client.publish('userData', jsonMqttSend);
-    mqttStore.latestMqttSend = jsonMqttSend;
+  if (jsonMovement != mqttStore.latestMovementSend) {
+    console.log("Sending MQTT user movement data:   " + jsonMovement);
+    client.publish('movement', jsonMovement);
+    mqttStore.latestMovementSend = jsonMovement;
   } else {
     console.log("MQTT user data is the same; Will not publish.");
   }

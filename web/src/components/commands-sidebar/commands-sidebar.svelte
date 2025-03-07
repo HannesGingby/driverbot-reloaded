@@ -10,6 +10,7 @@
   import Move from "lucide-svelte/icons/move";
   import PanelLeftClose from "lucide-svelte/icons/panel-left-close";
   import PanelLeftOpen from "lucide-svelte/icons/panel-left-open";
+  import MoveLeft from "lucide-svelte/icons/move-left";
 
   let tooltip = $state("");
 
@@ -21,8 +22,8 @@
   let SPressed = $state(false);
   let DPressed = $state(false);
 
-  import { commandsSidebar, mqttSendData } from "$lib/store.svelte.js";
-  import { sendMqtt } from "$lib/mqtt.js";
+  import { commandsSidebar, movementData } from "$lib/store.svelte.js";
+  import { sendMovement } from "$lib/mqtt.js";
 
   const mapCommands = [
     {
@@ -55,7 +56,10 @@
     {
       label: "Freedrive",
       tooltip: "Drive around freely with WASD.",
-      action: () => (freedriveActive = true),
+      action: () => {
+        freedriveActive = true;
+        tooltip = "";
+      },
       Icon: Move,
       Svg: Polygon,
       svgColor: "#2E2E2E",
@@ -64,41 +68,41 @@
 
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === "w") {
-      mqttSendData.direction = "forward";
+      movementData.direction = "forward";
       WPressed = true;
-      sendMqtt();
+      sendMovement();
     } else if (event.key === "a") {
-      mqttSendData.steer = "left";
+      movementData.steer = "left";
       APressed = true;
-      sendMqtt();
+      sendMovement();
     } else if (event.key === "s") {
-      mqttSendData.direction = "backward";
+      movementData.direction = "backward";
       SPressed = true;
-      sendMqtt();
+      sendMovement();
     } else if (event.key === "d") {
-      mqttSendData.steer = "right";
+      movementData.steer = "right";
       DPressed = true;
-      sendMqtt();
+      sendMovement();
     }
   }
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === "w") {
-      mqttSendData.direction = "";
+      movementData.direction = "";
       WPressed = false;
-      sendMqtt();
+      sendMovement();
     } else if (event.key === "a") {
-      mqttSendData.steer = "";
+      movementData.steer = "";
       APressed = false;
-      sendMqtt();
+      sendMovement();
     } else if (event.key === "s") {
-      mqttSendData.direction = "";
+      movementData.direction = "";
       SPressed = false;
-      sendMqtt();
+      sendMovement();
     } else if (event.key === "d") {
-      mqttSendData.steer = "";
+      movementData.steer = "";
       DPressed = false;
-      sendMqtt();
+      sendMovement();
     }
   }
 </script>
@@ -110,18 +114,23 @@
 >
   {#if active}
     {#if freedriveActive}
-      <h1 class="text-lg mb-5 font-bold">Movement</h1>
+      <div class="flex items-center mb-8">
+        <button onclick={() => freedriveActive = false} class="cursor-pointer">
+          <MoveLeft class="pb-5" size="48" onmouseenter={() => (tooltip = "Back")} onmouseleave={() => (tooltip = "")} />
+        </button>
+        <h1 class="text-lg mb-5 font-bold">Movement</h1>
+      </div>
       <div class="flex flex-col w-full items-center gap-2 mb-[52px]">
         <WasdButton
           key="w"
           bind:pressed={WPressed}
           mousedown={() => {
-            mqttSendData.direction = "forward";
-            sendMqtt();
+            movementData.direction = "forward";
+            sendMovement();
           }}
           mouseup={() => {
-            mqttSendData.direction = "";
-            sendMqtt();
+            movementData.direction = "";
+            sendMovement();
           }}
         />
         <div class="flex justify-between gap-2">
@@ -129,36 +138,36 @@
             key="a"
             bind:pressed={APressed}
             mousedown={() => {
-              mqttSendData.steer = "left";
-              sendMqtt();
+              movementData.steer = "left";
+              sendMovement();
             }}
             mouseup={() => {
-              mqttSendData.steer = "";
-              sendMqtt();
+              movementData.steer = "";
+              sendMovement();
             }}
           />
           <WasdButton
             key="s"
             bind:pressed={SPressed}
             mousedown={() => {
-              mqttSendData.direction = "backward";
-              sendMqtt();
+              movementData.direction = "backward";
+              sendMovement();
             }}
             mouseup={() => {
-              mqttSendData.direction = "";
-              sendMqtt();
+              movementData.direction = "";
+              sendMovement();
             }}
           />
           <WasdButton
             key="d"
             bind:pressed={DPressed}
             mousedown={() => {
-              mqttSendData.steer = "right";
-              sendMqtt();
+              movementData.steer = "right";
+              sendMovement();
             }}
             mouseup={() => {
-              mqttSendData.steer = "";
-              sendMqtt();
+              movementData.steer = "";
+              sendMovement();
             }}
           />
         </div>
