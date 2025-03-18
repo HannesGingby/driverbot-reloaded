@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
+  import gsap from "gsap";
 
   import Button from "../../components/global/button.svelte";
   import Input from "../../components/global/input.svelte";
@@ -17,7 +18,7 @@
   import { login } from "$lib/auth.js";
   import { connect } from "$lib/mqtt.js";
   import { authStore, mqttStore } from "$lib/store.svelte.js";
-  import Account from "../../components/bottombar/account.svelte";
+  import Account from "../../components/global/account.svelte";
 
   function loginUser(username: string, password: string) {
     const success = login(username, password);
@@ -45,6 +46,12 @@
       count = (count + 1) % 4; // cycle through
       dots = ".".repeat(count);
     }, 500);
+
+    gsap.fromTo(
+      "#gsap-top-down-opacity",
+      { opacity: 0, y: -10 },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.2 }
+    );
   });
 
   onDestroy(() => {
@@ -63,12 +70,12 @@
   </main>
 {:else if !authStore.loggedIn && !authStore.connectedToMQTT}
   <main class="flex items-center justify-center flex-col h-[90vh] gap-3 pb-42">
-    <div class="mb-8">
+    <div id="gsap-top-down-opacity" class="mb-8">
       <Logo />
     </div>
     <div class="w-xl">
-      <h1 class="text-xl font-bold mb-6">Login</h1>
-      <div class="w-full flex flex-col gap-2 mb-6">
+      <h1 id="gsap-top-down-opacity" class="text-xl font-bold mb-6">Login</h1>
+      <div id="gsap-top-down-opacity" class="w-full flex flex-col gap-2 mb-6">
         <Input
           placeholder="Username"
           Icon={ALargeSmall}
@@ -84,11 +91,11 @@
           iconToggle={true}
         />
       </div>
-      <p class="text-sm text-text-200 mb-2">
+      <p id="gsap-top-down-opacity" class="text-sm text-text-200 mb-2">
         When logging in you will be automatically connected to the MQTT broker
         associated with your account.
       </p>
-      <div class="w-[50%] mb-4">
+      <div id="gsap-top-down-opacity" class="w-[50%] mb-4">
         <Button
           action={() => loginUser(inputUsername, inputPassword)}
           style="normal"
@@ -103,19 +110,19 @@
   </main>
 {:else if authStore.loggedIn && !authStore.connectedToMQTT}
   <main class="flex items-center justify-center flex-col h-[90vh] gap-3 pb-42">
-    <div class="mb-8">
+    <div id="gsap-top-down-opacity" class="mb-8">
       <Logo />
     </div>
     <div class="w-xl">
-      <h1 class="text-xl font-bold mb-2">Logged in as {authStore.username}</h1>
-      <div class="mb-6">
+      <h1 id="gsap-top-down-opacity" class="text-xl font-bold mb-2">Logged in as {authStore.username}</h1>
+      <div id="gsap-top-down-opacity" class="mb-6">
         <Account />
       </div>
-      <p class="text-sm text-text-200 mb-2">
+      <p id="gsap-top-down-opacity" class="text-sm text-text-200 mb-2">
         When connecting you will be automatically connected to the MQTT broker
         associated with your account.
       </p>
-      <div class="w-[50%] mb-4">
+      <div id="gsap-top-down-opacity" class="w-[50%] mb-4">
         <Button
           action={() => connectUser()}
           style="normal"
@@ -126,7 +133,7 @@
       {#if authStore.mqttSuccess == false}
         <p class="text-sm text-bad absolute">
           MQTT connection failed. You probably have the wrong broker credentials
-          associated with your account. Try again.
+          associated with your account. Try again. Error message: {authStore.mqttError}
         </p>
       {/if}
     </div>

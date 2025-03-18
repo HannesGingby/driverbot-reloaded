@@ -32,7 +32,7 @@
       action: () => console.log("do something"),
       Icon: GitBranch,
       Svg: Polygon,
-      svgColor: "#EC5121",
+      svgColor: "var(--color-primary)",
     },
     {
       label: "Map known",
@@ -40,7 +40,7 @@
       action: () => console.log("do something"),
       Icon: Box,
       Svg: Polygon,
-      svgColor: "#5821DA",
+      svgColor: "var(--color-secondary)",
     },
     {
       label: "Map manual",
@@ -48,7 +48,7 @@
       action: () => console.log("do something"),
       Icon: Brain,
       Svg: Polygon,
-      svgColor: "#2E2E2E",
+      svgColor: "var(--color-bg-600)",
     },
   ];
 
@@ -62,7 +62,7 @@
       },
       Icon: Move,
       Svg: Polygon,
-      svgColor: "#2E2E2E",
+      svgColor: "var(--color-bg-600)",
     },
   ];
 

@@ -3,7 +3,7 @@
 </script>
 
 <button
-  class="flex items-center justify-between bg-bg-700 cursor-pointer w-full h-[50px] rounded-lg px-[20px] shadow-[inset_0px_4px_16px_rgba(0,0,0,0.12)]"
+  class="flex items-center justify-between bg-bg-700 hover:bg-bg-650 transition-colors cursor-pointer w-full h-[50px] rounded-lg px-[20px]"
   onclick={action}
 >
   <div class="flex items-center gap-1.5">

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SpinnerTypes } from "./types/spinner.type";
+  import type { SpinnerTypes } from "../../types/spinner.type.js";
   import { range, durationUnitRegex } from "$lib/utils.js";
   export let color: SpinnerTypes["color"] = "var(--color-text-200)";
   export let unit: SpinnerTypes["unit"] = "px";

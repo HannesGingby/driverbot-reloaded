@@ -1,6 +1,21 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
   let { action, style, confirm, text, confirmText = "" } = $props();
-  let displayConfirm = $state(false);
+  
+  let displayConfirm = $state(false)
+
+  let modal: Node | undefined = $state();
+
+  $effect(() => {
+    if (displayConfirm && modal && modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }});
+
+  onDestroy(() => {
+    if (modal && modal.parentNode === document.body) {
+      document.body.removeChild(modal);
+    }
+  });
 
   function handleClick() {
     toggleConfirm(true);
@@ -38,7 +53,7 @@
 {#if style === "destructive"}
   <button
     type="button"
-    class="cursor-pointer w-full h-[36px] bg-[#322121] text-[#865F5F] text-sm rounded-lg hover:bg-[#662C2C] hover:text-[#CA9090] transition-colors"
+    class="cursor-pointer w-full h-[36px] bg-destructive-bg text-destructive-text text-sm rounded-lg hover:bg-destructive-hover-bg hover:text-destructive-hover-text transition-colors"
     onclick={handleClick}
   >
     {text}
@@ -46,7 +61,7 @@
 {/if}
 
 {#if displayConfirm}
-  <div class="fixed inset-0 z-50 **:text-text-100">
+  <div bind:this={modal} id="overlay" class="fixed top-0 left-0 w-screen h-screen z-50 **:text-text-100">
     <button
       type="button"
       class="absolute inset-0 w-full h-full bg-pass-black cursor-default"
@@ -64,7 +79,7 @@
         </h1>
         <div class="flex gap-4">
           <button
-            class="w-full h-[36px] bg-bg-700 rounded-lg cursor-pointer text-sm"
+            class="w-full h-[36px] bg-bg-700 hover:bg-bg-600 transition-colors rounded-lg cursor-pointer text-sm"
             type="button"
             onclick={() => {
               action();
@@ -74,11 +89,11 @@
             Yes
           </button>
           <button
-            class="w-full h-[36px] bg-bg-700 rounded-lg cursor-pointer text-sm"
+            class="w-full h-[36px] bg-bg-700 hover:bg-bg-600 transition-colors rounded-lg cursor-pointer text-sm"
             type="button"
             onclick={() => toggleConfirm(false)}
           >
-            No &#40;cancel&#41;
+            No, cancel &#40;Esc&#41;
           </button>
         </div>
       </div>

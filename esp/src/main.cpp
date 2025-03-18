@@ -12,32 +12,19 @@
 #include "./mqtt/mqtt_handler.h"
 #include "./uart/uart_handler.h"
 
-// WiFi & Time Settings
-const char* ssid = "replace_this";
-const char* password = "replace_this";
+#include "./credentials.h"
 
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffsetSec = 0;
 const int daylightOffsetSec = 0;
 
 // MQTT Settings
-const char* mqttServer = "n39420ee.ala.eu-central-1.emqxsl.com";
-const char* mqttUsername = "replace_this";
-const char* mqttPassword = "replace_this";
 int mqttPort = 8883;
 String espClientId = "esp8266-client-" + String(WiFi.macAddress());
 
 // Global MQTT and SSL Client
 BearSSL::WiFiClientSecure espClient;
 PubSubClient client(espClient);
-
-static const char ca_cert[] = R"EOF(
------BEGIN CERTIFICATE-----
-
-replace_this
-
------END CERTIFICATE-----
-)EOF";
 
 // Global JSON Variables (shared by MQTT and Motor Control)
 String direction = "";

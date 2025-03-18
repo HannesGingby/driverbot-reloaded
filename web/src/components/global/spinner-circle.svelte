@@ -3,7 +3,7 @@
 -->
 
 <script lang="ts">
-  import type { SpinnerTypes } from "./types/spinner.type";
+  import type { SpinnerTypes } from "../../types/spinner.type.js";
   export let color: SpinnerTypes["color"] = "var(--color-text-200)";
   export let unit: SpinnerTypes["unit"] = "px";
   export let duration: SpinnerTypes["duration"] = "0.75s";

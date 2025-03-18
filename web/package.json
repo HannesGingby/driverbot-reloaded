@@ -44,6 +44,7 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
+		"gsap": "^3.12.7",
 		"lucide-svelte": "^0.475.0",
 		"mqtt": "^5.10.3"
 	}

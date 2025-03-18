@@ -3,7 +3,7 @@
 
   import Action from "../global/action.svelte";
   import VLine from "../global/v-line.svelte";
-  import Account from "./account.svelte";
+  import Account from "../global/account.svelte";
 
   import MoveLeft from "lucide-svelte/icons/move-left";
   import Signature from "lucide-svelte/icons/signature";

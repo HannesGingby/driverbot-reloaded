@@ -1,16 +1,19 @@
 <script lang="ts">
   import Logo from "./logo/logo.svelte";
   import Action from "../global/action.svelte";
-  import Toggle from "../global/toggle.svelte";
+  import Toggle from "../global/theme-toggle.svelte";
 
   import FileInput from "lucide-svelte/icons/file-input";
   import FileDown from "lucide-svelte/icons/file-down";
   import Moon from "lucide-svelte/icons/moon";
+  import Sun from "lucide-svelte/icons/sun";
+
+  import { theme } from "$lib/store.svelte.js";
 </script>
 
 <div class="flex justify-between flex-nowrap items-center *:w-1/3">
   <div>
-    <Logo></Logo>
+    <Logo />
   </div>
   <div class="flex gap-6 flex-nowrap justify-center">
     <Action
@@ -35,6 +38,6 @@
     ></Action>
   </div>
   <div class="flex justify-end">
-    <Toggle defaultValue="true" label="Theme:" Icon={Moon} />
+    <Toggle defaultValue={theme.lightMode} label="Theme:" IconEnabled={Sun} IconDisabled={Moon} />
   </div>
 </div>

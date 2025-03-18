@@ -1,11 +1,19 @@
 import { disconnect } from "./mqtt.js";
-import { authStore, mqttStore, resetMqttStore, resetAuthStore } from "./store.svelte.js";
+import { authStore, mqttStore, resetMqttStore, resetAuthStore, logApplicationEvent } from "./store.svelte.js";
 
 export function login(username: string, password: string): boolean {
   // todo
 
   // todo: get MQTT collection associated with the user
-  const clusterURL = "wss://n39420ee.ala.eu-central-1.emqxsl.com:8084/mqtt";
+
+  authStore.loggedIn = true;
+  authStore.username = username;
+
+  logApplicationEvent("Login successful");
+  return true;
+}
+
+export function setManualMQTT(clusterURL: string, username: string, password: string ) {
   const url = new URL(clusterURL);
   const clusterBaseURL = url.hostname;
   const clusterPort = parseInt(url.port);
@@ -13,19 +21,19 @@ export function login(username: string, password: string): boolean {
   mqttStore.clusterURL = clusterURL;
   mqttStore.clusterBaseURL = clusterBaseURL;
   mqttStore.port = clusterPort;
-  mqttStore.username = "replace_this";
-  mqttStore.password = "replace_this";
+  mqttStore.username = username;
+  mqttStore.password = password;
 
-  authStore.loggedIn = true;
-  authStore.username = "Hannes";
-  return true;
+  logApplicationEvent("Manual MQTT connection set");
 }
 
 export function logout() {
   // todo
 
   disconnect();
+  logApplicationEvent("Disconnected from MQTT");
 
   resetAuthStore();
   resetMqttStore();
+  logApplicationEvent("Resetting session data");
 }

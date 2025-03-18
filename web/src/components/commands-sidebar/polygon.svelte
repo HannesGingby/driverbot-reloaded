@@ -15,39 +15,4 @@
       fill={color}
     />
   </g>
-  <!--
-  <defs>
-    <filter
-      id="filter0_i_39_1592"
-      x="0"
-      y="0.864471"
-      width="10.7085"
-      height="20.271"
-      filterUnits="userSpaceOnUse"
-      color-interpolation-filters="sRGB"
-    >
-      <feFlood flood-opacity="0" result="BackgroundImageFix" />
-      <feBlend
-        mode="normal"
-        in="SourceGraphic"
-        in2="BackgroundImageFix"
-        result="shape"
-      />
-      <feColorMatrix
-        in="SourceAlpha"
-        type="matrix"
-        values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-        result="hardAlpha"
-      />
-      <feOffset dy="6" />
-      <feGaussianBlur stdDeviation="4" />
-      <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-      <feColorMatrix
-        type="matrix"
-        values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.16 0"
-      />
-      <feBlend mode="normal" in2="shape" result="effect1_innerShadow_39_1592" />
-    </filter>
-  </defs>
-  -->
 </svg>

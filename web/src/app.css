@@ -1,4 +1,6 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-bg-900: oklch(20.46% 0 0);
@@ -12,14 +14,21 @@
   --color-text-200: oklch(49.41% 0.0073 75.35);
   --color-text-300: oklch(36.41% 0.0037 84.58);
 
-  --color-primary: oklch(64.19% 0.1994 36.48);
-  --color-secondary: oklch(46.52% 0.2479 284.9);
+  --color-logo: oklch(84.05% 0.0053 67.75);
+
+  --color-primary: oklch(0.637 0.237 25.331);
+  --color-secondary: oklch(46.07% 0.2442 291.71);
   --color-line: oklch(26.86% 0 0);
   --color-grid: oklch(33.29% 0 0);
 
   --color-good: oklch(84.69% 0.253 143.77);
   --color-bad: oklch(63.92% 0.2182 25.94);
   --color-pass-black: oklch(0% 0 25.94 / 24%);
+
+  --color-destructive-bg: #322121;
+  --color-destructive-text: #865F5F;
+  --color-destructive-hover-bg: #662C2C;
+  --color-destructive-hover-text: #CA9090;
 
   --font-sans: 'Bricolage Grotesque', sans-serif;
 
@@ -31,8 +40,36 @@
   --default-transition-duration: 200ms;
 }
 
+/* Dark Mode */
+.light {
+  --color-bg-900: oklch(95% 0 0);
+  --color-bg-800: oklch(93% 0 0);
+  --color-bg-700: oklch(90% 0 0);
+  --color-bg-650: oklch(85% 0 0);
+  --color-bg-600: oklch(88% 0 0);
+  --color-bg-500: oklch(70% 0 0);
+
+  --color-text-100: oklch(40% 0.0053 67.75);
+  --color-text-200: oklch(60% 0.0073 75.35);
+  --color-text-300: oklch(70% 0.0037 84.58);
+
+  --color-logo: oklch(80% 0.0053 67.75);
+
+  --color-line: oklch(85% 0 0);
+  --color-grid: oklch(75% 0 0);
+
+  --color-good: oklch(64% 0.253 143.77);
+  --color-bad: oklch(65% 0.2182 25.94);
+  --color-pass-black: oklch(0% 0 25.94 / 10%);
+
+  --color-destructive-bg: #e6cbcb;
+  --color-destructive-text: #BF4545;
+  --color-destructive-hover-bg: #e6b4b4;
+  --color-destructive-hover-text: #8d3333;
+}
+
 body {
-  @apply bg-bg-900 text-text-100 font-sans font-medium px-8 pt-8 !m-0;
+  @apply bg-bg-900 text-text-100 font-sans font-medium px-8 pt-8 !m-0 selection:bg-text-100 selection:text-bg-900;
 }
 
 @keyframes noiseAnimation {
@@ -67,4 +104,19 @@ body::before {
 .no-spinner {
   appearance: textfield;
   -moz-appearance: textfield; /* Firefox */
+}
+
+@layer components {
+  .link {
+    @apply relative inline-block transition-all duration-500;
+  }
+
+  .link::after {
+    content: '';
+    @apply absolute left-0 bottom-[-1px] h-[3px] w-full bg-primary scale-x-0 origin-bottom-right transition-transform duration-300 ease-in-out;
+  }
+
+  .link:hover::after {
+    @apply scale-x-100 origin-bottom-left;
+  }
 }

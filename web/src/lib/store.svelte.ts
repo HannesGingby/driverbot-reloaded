@@ -1,3 +1,7 @@
+export const theme = $state({
+  lightMode: false,
+});
+
 export const co = $state({
   mouseCo: [0, 0],
 });
@@ -19,6 +23,7 @@ interface AuthStore {
   loginSuccess?: boolean;
   username: string;
   mqttSuccess?: boolean;
+  mqttError?: string;
   connectedToMQTT: boolean;
   attemptingMQTTConnection: boolean;
 }
@@ -28,6 +33,7 @@ export const authStore = $state<AuthStore>({
   loginSuccess: undefined,
   username: "",
   mqttSuccess: undefined,
+  mqttError: undefined,
   connectedToMQTT: false,
   attemptingMQTTConnection: false,
 })
@@ -95,3 +101,8 @@ export const movementData = $state<movement>({
 })
 
 export const applicationLogs = $state({logs: [["Init", new Date()]]});
+
+export function logApplicationEvent(log: string): void {
+  applicationLogs.logs.push([log, new Date()]);
+  console.log(log);
+}

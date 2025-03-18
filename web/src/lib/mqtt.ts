@@ -1,7 +1,7 @@
 import mqtt from "mqtt";
 
 import { routeToPage } from "./utils.js";
-import { authStore, mqttStore, movementData } from "./store.svelte.js";
+import { authStore, mqttStore, movementData, logApplicationEvent } from "./store.svelte.js";
 
 let client : any;
 let connectionTimeoutId : any;
@@ -34,9 +34,10 @@ export function connect(clusterURL: string, username: string, password: string) 
   });
 
   client.on('connect', function () {
-    console.log('Connected to the broker');
+    logApplicationEvent("Connected to MQTT broker");
     authStore.connectedToMQTT = true;
     authStore.mqttSuccess = true;
+    authStore.mqttError = undefined;
 
     setTimeout(() => {
       authStore.attemptingMQTTConnection = false;
@@ -48,21 +49,22 @@ export function connect(clusterURL: string, username: string, password: string) 
   });
 
   client.on('close', function() {
-    console.log("Disconnected from the broker");
+    logApplicationEvent("Disconnected from MQTT broker");
     authStore.connectedToMQTT = false;
     routeToPage("login");
   });
 
   client.on('error', function (error : any) {
-    console.log(error);
+    logApplicationEvent(error);
     authStore.mqttSuccess = false;
+    authStore.mqttError = error;
   });
 
   client.on('message', function (topic: string, message : any) {
     if (topic == "esp") {
       // Parse JSON data
       let recievedEspData = JSON.parse(message);
-      console.log("ESP Data: ", recievedEspData);
+      logApplicationEvent("ESP Data: " + recievedEspData.toString());
     }
 
     if (topic === "ping") {
@@ -100,17 +102,15 @@ export function sendMovement() {
   const jsonMovement = JSON.stringify(movementData);
 
   if (jsonMovement != mqttStore.latestMovementSend) {
-    console.log("Sending MQTT user movement data:   " + jsonMovement);
+    logApplicationEvent("Sending MQTT user movement data: " + jsonMovement);
     client.publish('movement', jsonMovement);
     mqttStore.latestMovementSend = jsonMovement;
-  } else {
-    console.log("MQTT user data is the same; Will not publish.");
   }
 }
 
 // Disconnect from the broker
 export function disconnect() {
-  console.log("Disconnecting...");
+  logApplicationEvent("Disconnecting...");
 
   client.end();
 

@@ -5,7 +5,7 @@
 
   import SpinnerCircle from "../global/spinner-circle.svelte";
 
-  let rowCount = $state(11);
+  let rowCount = $state(0);
   let columnCount = $state(0);
   let currentMouseCo: [number, number] = [0, 0];
   let gridElement: HTMLElement | undefined = $state();
