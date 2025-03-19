@@ -6,6 +6,8 @@ export function login(username: string, password: string): boolean {
 
   // todo: get MQTT collection associated with the user
 
+  setManualMQTT("wss://n39420ee.ala.eu-central-1.emqxsl.com:8084/mqtt", "hg", "~hBP@3rnCSBAmi6");
+
   authStore.loggedIn = true;
   authStore.username = username;
 

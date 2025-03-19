@@ -5,8 +5,8 @@
 #include <Servo.h>
 
 // Define motor and servo pins
-#define MOTOR_PIN_RIGHT_DIR 0    // D3 (GPIO 0)
-#define MOTOR_PIN_RIGHT_SPEED 2  // D4 (GPIO 2)
+#define MOTOR_PIN_RIGHT_DIR 5    // D1 (GPIO 5)
+#define MOTOR_PIN_RIGHT_SPEED 0  // D3 (GPIO 0)
 #define SERVO_PIN 14             // D5 (GPIO 14)
 
 // Declare the servo object used for steering

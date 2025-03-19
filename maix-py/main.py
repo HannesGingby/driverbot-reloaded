@@ -65,27 +65,28 @@ def p_controller(sp, pv, kp, p0):
     output = kp * e + p0
 
     return output
-    
+
 def follow_blob(blobs, img, min_blob_pixel_size=2000):
     if blobs:
         b = max(blobs, key=lambda x: x.pixels())  # Find the largest blob
         if b.pixels() > min_blob_pixel_size:
-            cx_value = b.cx()
-            center = img.width() / 2
+            cy_value = b.cy()
+            center = img.height() / 2
 
             correction = p_controller(center, cx_value, 0.5, 90)
             servo_angle = max(0, min(180, int(correction)))
 
             uart.write(str(servo_angle) + "\n")
-        else:
             uart.write("w\n")
+        else:
+            uart.write("x\n")
 
 def draw_blob_rectangle(blobs, img):
     if blobs:
         b = max(blobs, key=lambda x: x.pixels())  # Largest blob
         if b.pixels() > 2000:
             print(b)
-            e = img.width() / 2 - b.cx()
+            e = img.height() / 2 - b.cy()
             print(e)
             img.draw_rectangle(b[0:4])
 
@@ -109,6 +110,8 @@ while True:
     clock.tick()
 
     img = sensor.snapshot()
+    img = img.rotation_corr(z_rotation=90)
+
     th = (0, 100, 12, 49, -8, 127)
     blobs = img.find_blobs([th])
 

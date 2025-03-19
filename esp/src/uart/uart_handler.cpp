@@ -1,7 +1,7 @@
 #include "uart_handler.h"
 #include "../motor_control/motor_control.h"
 
-SoftwareSerial serial(4, 5); // RX, TX
+SoftwareSerial serial(4, 2); // RX, TX   (D2, D4)
 
 void setupUART() {
     serial.begin(115200);
@@ -25,7 +25,9 @@ void followLine() {
 
     if (buffedString.length() > 0) {
         if (buffedString == "w") {
-            driveForward(100);
+            driveForward(255);
+        } else if (buffedString == "x") {
+            stopDriving();
         } else {
             int servoAngle = buffedString.toInt();
             servoAngle = constrain(servoAngle, 0, 180);  // Ensure valid range

@@ -68,19 +68,19 @@
 
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === "w") {
-      movementData.direction = "forward";
+      movementData.direction = 1;
       WPressed = true;
       sendMovement();
     } else if (event.key === "a") {
-      movementData.steer = "left";
+      movementData.steer = -1;
       APressed = true;
       sendMovement();
     } else if (event.key === "s") {
-      movementData.direction = "backward";
+      movementData.direction = -1;
       SPressed = true;
       sendMovement();
     } else if (event.key === "d") {
-      movementData.steer = "right";
+      movementData.steer = 1;
       DPressed = true;
       sendMovement();
     }
@@ -88,19 +88,19 @@
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === "w") {
-      movementData.direction = "";
+      movementData.direction = 0;
       WPressed = false;
       sendMovement();
     } else if (event.key === "a") {
-      movementData.steer = "";
+      movementData.steer = 0;
       APressed = false;
       sendMovement();
     } else if (event.key === "s") {
-      movementData.direction = "";
+      movementData.direction = 0;
       SPressed = false;
       sendMovement();
     } else if (event.key === "d") {
-      movementData.steer = "";
+      movementData.steer = 0;
       DPressed = false;
       sendMovement();
     }
@@ -125,11 +125,11 @@
           key="w"
           bind:pressed={WPressed}
           mousedown={() => {
-            movementData.direction = "forward";
+            movementData.direction = 1;
             sendMovement();
           }}
           mouseup={() => {
-            movementData.direction = "";
+            movementData.direction = 0;
             sendMovement();
           }}
         />
@@ -138,11 +138,11 @@
             key="a"
             bind:pressed={APressed}
             mousedown={() => {
-              movementData.steer = "left";
+              movementData.steer = -1;
               sendMovement();
             }}
             mouseup={() => {
-              movementData.steer = "";
+              movementData.steer = 0;
               sendMovement();
             }}
           />
@@ -150,11 +150,11 @@
             key="s"
             bind:pressed={SPressed}
             mousedown={() => {
-              movementData.direction = "backward";
+              movementData.direction = -1;
               sendMovement();
             }}
             mouseup={() => {
-              movementData.direction = "";
+              movementData.direction = 0;
               sendMovement();
             }}
           />
@@ -162,11 +162,11 @@
             key="d"
             bind:pressed={DPressed}
             mousedown={() => {
-              movementData.steer = "right";
+              movementData.steer = 1;
               sendMovement();
             }}
             mouseup={() => {
-              movementData.steer = "";
+              movementData.steer = 0;
               sendMovement();
             }}
           />

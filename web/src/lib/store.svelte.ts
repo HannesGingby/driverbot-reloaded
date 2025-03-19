@@ -87,8 +87,8 @@ export function resetMqttStore() {
 }
 
 interface movement {
-  direction?: string,
-  steer?: string,
+  direction?: number,
+  steer?: number,
   speed?: number,
   steerAngle?: number,
 }

@@ -110,6 +110,8 @@ void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(MOTOR_PIN_RIGHT_DIR, OUTPUT);
     pinMode(MOTOR_PIN_RIGHT_SPEED, OUTPUT);
+    analogWrite(MOTOR_PIN_RIGHT_SPEED, 1);
+    digitalWrite(MOTOR_PIN_RIGHT_DIR, 1);
     servo.attach(SERVO_PIN);
 
     // Set up SSL and MQTT client

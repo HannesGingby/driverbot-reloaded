@@ -2,6 +2,8 @@
 #include "mqtt_handler.h"
 #include "../motor_control/motor_control.h"  // For motor control functions
 
+#include "../credentials.h"
+
 // The MQTT client is defined in main.cpp
 extern PubSubClient client;
 
@@ -29,7 +31,8 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         serializeJson(doc, Serial);
         Serial.println();
 
-        int driveSpeed = (speedPercentage * maxMotorSpeed) / 100;
+        //int driveSpeed = (speedPercentage * maxMotorSpeed) / 100;
+        int driveSpeed = 255;
 
         if (direction == 1) {
             driveForward(driveSpeed);
@@ -48,10 +51,12 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         }
     }
 
+    /*
     if (strcmp(topic, "ping") == 0) {
         Serial.println("Ping message received, sending response");
         client.publish("ping", "1");
     }
+    */
 }
 
 void connectMQTT() {
@@ -59,7 +64,6 @@ void connectMQTT() {
         Serial.print("Attempting MQTT connection…");
 
         // Resolve broker hostname first
-        extern const char* mqttServer;
         IPAddress brokerIP;
         if (WiFi.hostByName(mqttServer, brokerIP)) {
             Serial.print("Resolved broker IP: ");
@@ -70,8 +74,6 @@ void connectMQTT() {
             continue;
         }
 
-        extern const char* mqttUsername;
-        extern const char* mqttPassword;
         extern String espClientId;
         if (client.connect(espClientId.c_str(), mqttUsername, mqttPassword)) {
             Serial.println("Connected to MQTT broker");

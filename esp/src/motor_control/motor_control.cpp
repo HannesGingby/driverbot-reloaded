@@ -6,15 +6,23 @@ const int maxMotorSpeed = 255;
 void driveForward(int speed) {
     Serial.print("Driving forward with the speed of ");
     Serial.println(speed);
-    digitalWrite(MOTOR_PIN_RIGHT_DIR, 0);
-    analogWrite(MOTOR_PIN_RIGHT_SPEED, speed);
+
+    analogWrite(MOTOR_PIN_RIGHT_SPEED, 1);
+    digitalWrite(MOTOR_PIN_RIGHT_DIR, 1);
+
+    // digitalWrite(MOTOR_PIN_RIGHT_DIR, 1);
+    // analogWrite(MOTOR_PIN_RIGHT_SPEED, speed);
 }
 
 void driveBackward(int speed) {
     Serial.print("Driving backward with the speed of ");
     Serial.println(speed);
-    digitalWrite(MOTOR_PIN_RIGHT_DIR, 1);
-    analogWrite(MOTOR_PIN_RIGHT_SPEED, speed);
+
+    analogWrite(MOTOR_PIN_RIGHT_SPEED, 1);
+    digitalWrite(MOTOR_PIN_RIGHT_DIR, 0);
+    
+    //digitalWrite(MOTOR_PIN_RIGHT_DIR, 1);
+    //analogWrite(MOTOR_PIN_RIGHT_SPEED, speed);
 }
 
 void steerRight(int angle, int speed) {
@@ -33,6 +41,7 @@ void steerLeft(int angle, int speed) {
 }
 
 void stopDriving() {
+    Serial.print("Stop driving");
     digitalWrite(MOTOR_PIN_RIGHT_DIR, 0);
     analogWrite(MOTOR_PIN_RIGHT_SPEED, 0);
 }
