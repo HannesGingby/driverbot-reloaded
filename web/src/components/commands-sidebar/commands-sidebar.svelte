@@ -3,6 +3,7 @@
   import Polygon from "./polygon.svelte";
   import HLine from "../global/h-line.svelte";
   import WasdButton from "./freedrive/wasd-button.svelte";
+  import RangeInput from "./freedrive/range-input.svelte";
 
   import GitBranch from "lucide-svelte/icons/git-branch";
   import Box from "lucide-svelte/icons/box";
@@ -12,18 +13,29 @@
   import PanelLeftOpen from "lucide-svelte/icons/panel-left-open";
   import MoveLeft from "lucide-svelte/icons/move-left";
 
+  import { gsap } from "gsap";
+
   let tooltip = $state("");
 
   let active = $state(true);
   let freedriveActive = $state(false);
 
-  let WPressed = $state(false);
-  let APressed = $state(false);
-  let SPressed = $state(false);
-  let DPressed = $state(false);
+  $effect(() => {
+    if (freedriveActive) {
+      gsap.fromTo("#gsap-command-tab", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power1.out" });
+    } else if (!freedriveActive) {
+      gsap.fromTo("#gsap-commands-menu", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power1.out" });
+    }
+  })
+
+  let wPressed = $state(false);
+  let aPressed = $state(false);
+  let sPressed = $state(false);
+  let dPressed = $state(false);
 
   import { commandsSidebar, movementData } from "$lib/store.svelte.js";
   import { sendMovement } from "$lib/mqtt.js";
+  import { onMount } from "svelte";
 
   const mapCommands = [
     {
@@ -68,43 +80,56 @@
 
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === "w") {
-      movementData.direction = 1;
-      WPressed = true;
+      movementData.driveDirection = 1;
+      wPressed = true;
       sendMovement();
     } else if (event.key === "a") {
-      movementData.steer = -1;
-      APressed = true;
+      movementData.steerDirection = -1;
+      aPressed = true;
       sendMovement();
     } else if (event.key === "s") {
-      movementData.direction = -1;
-      SPressed = true;
+      movementData.driveDirection = -1;
+      sPressed = true;
       sendMovement();
     } else if (event.key === "d") {
-      movementData.steer = 1;
-      DPressed = true;
+      movementData.steerDirection = 1;
+      dPressed = true;
       sendMovement();
     }
   }
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === "w") {
-      movementData.direction = 0;
-      WPressed = false;
+      movementData.driveDirection = 0;
+      wPressed = false;
       sendMovement();
     } else if (event.key === "a") {
-      movementData.steer = 0;
-      APressed = false;
+      movementData.steerDirection = 0;
+      aPressed = false;
       sendMovement();
     } else if (event.key === "s") {
-      movementData.direction = 0;
-      SPressed = false;
+      movementData.driveDirection = 0;
+      sPressed = false;
       sendMovement();
     } else if (event.key === "d") {
-      movementData.steer = 0;
-      DPressed = false;
+      movementData.steerDirection = 0;
+      dPressed = false;
       sendMovement();
     }
   }
+
+  function handleFreedriveBack() {
+    gsap.fromTo("#gsap-command-tab", { opacity: 1, x: 0 }, { opacity: 0, x: -20, duration: 0.4, ease: "power1.out" });
+
+    setTimeout(() => {
+      freedriveActive = false;
+    }, 200);
+  }
+
+  onMount(() => {
+    movementData.driveSpeed = 100;
+    movementData.steerSpeed = 50;
+  });
 </script>
 
 <svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
@@ -114,100 +139,114 @@
 >
   {#if active}
     {#if freedriveActive}
-      <div class="flex items-center mb-8">
-        <button onclick={() => freedriveActive = false} class="cursor-pointer">
-          <MoveLeft class="pb-5" size="48" onmouseenter={() => (tooltip = "Back")} onmouseleave={() => (tooltip = "")} />
-        </button>
-        <h1 class="text-lg mb-5 font-bold">Movement</h1>
-      </div>
-      <div class="flex flex-col w-full items-center gap-2 mb-[52px]">
-        <WasdButton
-          key="w"
-          bind:pressed={WPressed}
-          mousedown={() => {
-            movementData.direction = 1;
-            sendMovement();
-          }}
-          mouseup={() => {
-            movementData.direction = 0;
-            sendMovement();
-          }}
-        />
-        <div class="flex justify-between gap-2">
+      <div id="gsap-command-tab">
+        <div class="flex items-center mb-8">
+          <button onclick={handleFreedriveBack} class="cursor-pointer">
+            <MoveLeft class="pb-5" size="48" onmouseenter={() => (tooltip = "Back")} onmouseleave={() => (tooltip = "")} />
+          </button>
+          <h1 class="text-lg mb-5 font-bold">Movement</h1>
+        </div>
+        <div class="flex flex-col w-full items-center gap-2 mb-12">
           <WasdButton
-            key="a"
-            bind:pressed={APressed}
+            key="w"
+            bind:pressed={wPressed}
             mousedown={() => {
-              movementData.steer = -1;
+              movementData.driveDirection = 1;
               sendMovement();
             }}
             mouseup={() => {
-              movementData.steer = 0;
+              movementData.driveDirection = 0;
               sendMovement();
             }}
           />
-          <WasdButton
-            key="s"
-            bind:pressed={SPressed}
-            mousedown={() => {
-              movementData.direction = -1;
-              sendMovement();
-            }}
-            mouseup={() => {
-              movementData.direction = 0;
-              sendMovement();
-            }}
-          />
-          <WasdButton
-            key="d"
-            bind:pressed={DPressed}
-            mousedown={() => {
-              movementData.steer = 1;
-              sendMovement();
-            }}
-            mouseup={() => {
-              movementData.steer = 0;
-              sendMovement();
-            }}
-          />
+          <div class="flex justify-between gap-2">
+            <WasdButton
+              key="a"
+              bind:pressed={aPressed}
+              mousedown={() => {
+                movementData.steerDirection = -1;
+                sendMovement();
+              }}
+              mouseup={() => {
+                movementData.steerDirection = 0;
+                sendMovement();
+              }}
+            />
+            <WasdButton
+              key="s"
+              bind:pressed={sPressed}
+              mousedown={() => {
+                movementData.driveDirection = -1;
+                sendMovement();
+              }}
+              mouseup={() => {
+                movementData.driveDirection = 0;
+                sendMovement();
+              }}
+            />
+            <WasdButton
+              key="d"
+              bind:pressed={dPressed}
+              mousedown={() => {
+                movementData.steerDirection = 1;
+                sendMovement();
+              }}
+              mouseup={() => {
+                movementData.steerDirection = 0;
+                sendMovement();
+              }}
+            />
+          </div>
+        </div>
+        <div class="mb-[52px]">
+          <h1 class="text-lg mb-5 font-bold">Drive speed</h1>
+          <p class="mb-1">{movementData.driveSpeed}%</p>
+          <RangeInput bind:value={movementData.driveSpeed} onchange={sendMovement} name="driveSpeed" min="0" max="100" step="10" />
+        </div>
+        <div class="mb-[52px]">
+          <h1 class="text-lg mb-5 font-bold">Steer speed</h1>
+          <p class="mb-1">{movementData.steerSpeed}%</p>
+          <RangeInput bind:value={movementData.steerSpeed} onchange={sendMovement} name="steerSpeed" min="0" max="100" step="10" />
         </div>
       </div>
     {:else}
-      <h1 class="text-lg mb-5 font-bold">Explore</h1>
-      <ul class="flex flex-col gap-[14px] mb-[52px]">
-        {#each mapCommands as command}
-          <li
-            onmouseenter={() => (tooltip = command.tooltip)}
-            onmouseleave={() => (tooltip = "")}
-          >
-            <Command
-              action={command.action}
-              label={command.label}
-              Icon={command.Icon}
-              Svg={command.Svg}
-              svgColor={command.svgColor}
-            />
-          </li>
-        {/each}
-      </ul>
-      <HLine styles="mb-[20px]" />
-      <h1 class="text-lg mb-5 font-bold">Drive</h1>
-      <ul class="flex flex-col gap-[14px] mb-[52px]">
-        {#each otherCommands as command}
-          <li
-            onmouseenter={() => (tooltip = command.tooltip)}
-            onmouseleave={() => (tooltip = "")}
-          >
-            <Command
-              action={command.action}
-              label={command.label}
-              Icon={command.Icon}
-              Svg={command.Svg}
-              svgColor={command.svgColor}
-            />
-          </li>
-        {/each}
-      </ul>
+      <div id="gsap-commands-menu">
+        <h1 class="text-lg mb-5 font-bold">Explore</h1>
+        <ul class="flex flex-col gap-[14px] mb-[52px]">
+          {#each mapCommands as command}
+            <li
+              onmouseenter={() => (tooltip = command.tooltip)}
+              onmouseleave={() => (tooltip = "")}
+            >
+              <Command
+                action={command.action}
+                label={command.label}
+                Icon={command.Icon}
+                Svg={command.Svg}
+                svgColor={command.svgColor}
+              />
+            </li>
+          {/each}
+        </ul>
+        <HLine styles="mb-[20px]" />
+        <h1 class="text-lg mb-5 font-bold">Drive</h1>
+        <ul class="flex flex-col gap-[14px] mb-[52px]">
+          {#each otherCommands as command}
+            <li
+              onmouseenter={() => (tooltip = command.tooltip)}
+              onmouseleave={() => (tooltip = "")}
+            >
+              <Command
+                action={command.action}
+                label={command.label}
+                Icon={command.Icon}
+                Svg={command.Svg}
+                svgColor={command.svgColor}
+              />
+            </li>
+          {/each}
+        </ul>
+      </div>
     {/if}
     <HLine styles="mb-[20px]" />
     {#if tooltip}

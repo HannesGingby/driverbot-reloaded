@@ -8,10 +8,10 @@
 extern PubSubClient client;
 
 // Global JSON fields defined in main.cpp
-extern int direction;
-extern int steer;
-extern int speedPercentage;
-extern int steerAngle;
+extern int driveDirection;
+extern int steerDirection;
+extern int driveSpeedPercentage;
+extern int steerSpeedPercentage;
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
     Serial.println("Message arrived [");
@@ -22,32 +22,56 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         DynamicJsonDocument doc(512);
         deserializeJson(doc, payload, length);
 
-        direction = doc["direction"].as<int>();
-        steer = doc["steer"].as<int>();
-        speedPercentage = doc["speed"];
-        steerAngle = doc["steerAngle"];
+        if (doc.containsKey("driveDirection")) {
+            driveDirection = doc["driveDirection"].as<int>();
+        } else {
+            driveDirection = 0;  // Default value
+        }
+
+        if (doc.containsKey("steerDirection")) {
+            steerDirection = doc["steerDirection"].as<int>();
+        } else {
+            steerDirection = 0;
+        }
+
+        if (doc.containsKey("driveSpeed")) {
+            driveSpeedPercentage = doc["driveSpeed"].as<int>();
+        } else {
+            driveSpeedPercentage = 100;
+        }
+
+        if (doc.containsKey("steerSpeed")) {
+            steerSpeedPercentage = doc["steerSpeed"].as<int>();
+        } else {
+            steerSpeedPercentage = 50;
+        }
 
         Serial.print("Received JSON: ");
         serializeJson(doc, Serial);
         Serial.println();
 
-        //int driveSpeed = (speedPercentage * maxMotorSpeed) / 100;
-        int driveSpeed = 255;
+        int driveSpeed = (driveSpeedPercentage * maxMotorSpeed) / 100;
+        int steerSpeed = (steerSpeedPercentage * maxMotorSpeed) / 100;
 
-        if (direction == 1) {
-            driveForward(driveSpeed);
-        } else if (direction == -1) {
-            driveBackward(driveSpeed);
-        } else if (direction == 0) {
-            stopDriving();
+        if (driveDirection == 1) {
+            drive(driveSpeed, true);    // Forward
+        } else if (driveDirection == -1) {
+            drive(driveSpeed, false);   // Backward
         }
 
-        if (steer == 1) {
-            steerRight(steerAngle, driveSpeed);
-        } else if (steer == -1) {
-            steerLeft(steerAngle, driveSpeed);
-        } else if (steer == 0) {
-            resetSteering();
+        if (steerDirection == 1) {
+            steer(steerSpeed, true);  // Right
+        } else if (steerDirection == -1) {
+            steer(steerSpeed, false);  // Left
+        }
+
+        if (driveDirection == 0 && steerDirection == 0) {
+            // When not steering or driving
+            isSteering = false;
+            stopMotors();   // Stop
+        } else if (driveDirection == 0 && steerDirection != 0) {
+            // When steering
+            isSteering = true;
         }
     }
 

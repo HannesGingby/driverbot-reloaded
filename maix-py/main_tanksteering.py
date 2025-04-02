@@ -66,27 +66,24 @@ def p_controller(sp, pv, kp, p0):
 
     return output
 
-def follow_blob(blobs, img, min_blob_pixel_size=2000):
-    if blobs:
-        b = max(blobs, key=lambda x: x.pixels())  # Find the largest blob
-        if b.pixels() > min_blob_pixel_size:
-            cx_value = b.cx()
-            center = img.width() / 2
+#def steer(speed, direction):
+ #   if speed == 0:
+  #      uart.write("t" + str(speed)*2 + str(direction) + "\n")
+   # else:
+    #    uart.write("t" + str(speed) + str(direction) + "\n")
 
-            correction = p_controller(center, cx_value, 0.5, 90)
-            servo_angle = max(0, min(180, int(correction)))
+def steer(speed, direction):
+    # Format command as: t,<speed>,<direction>\n
+    cmd = "t,{0},{1}\n".format(speed, direction)
+    uart.write(cmd)
 
-            print(servo_angle)
-            uart.write(str(servo_angle) + "\n")
-            uart.write("w\n")
-        else:
-            uart.write("x\n")
+def stop_motors():
+    uart.write("x\n")
 
-prev_servo_angle = 0
+def stop_steering():
+    uart.write("z\n")
 
-def follow_line(line, img, max_allowed_servo_change):
-    global prev_servo_angle
-
+def follow_line(line, img):
     if line:
         # Draw the detected line
         img.draw_line(line.x1(), line.y1(), line.x2(), line.y2(), image.rgb_to_lab((0, 255, 0)))
@@ -103,49 +100,23 @@ def follow_line(line, img, max_allowed_servo_change):
         line_center_x = (line.x1() + line.x2()) / 2
         distance_to_center = x_center - line_center_x
 
-        # Calculate desired servo output
-        servo_output = max(-90, min(90, int(distance_to_center * 0.5)))  # Scaled down for smoother response
+        # Determine steering logic
+        error = abs(distance_to_center)
 
-        # Smooth servo angle changes
-        degree_change = abs(servo_output - prev_servo_angle)
-
-        # Apply smooth servo angle transition
-        if degree_change > max_allowed_servo_change:
-            # Gradually move towards the target angle
-            if servo_output > prev_servo_angle:
-                servo_angle = prev_servo_angle + max_allowed_servo_change
-            else:
-                servo_angle = prev_servo_angle - max_allowed_servo_change
-        else:
-            # Use a weighted average for smoother transition
-            servo_angle = int(0.7 * prev_servo_angle + 0.3 * servo_output)
-
-        # Update previous servo angle
-        prev_servo_angle = servo_angle
-
-        # Send servo command
-        print(servo_angle)
-        uart.write(str(servo_angle) + "\n")
-        uart.write("w\n")
-
+        if error <= 10:
+            # Line is centered or very close to center
+            stop_steering()
+            # Drive forward
+            uart.write("w\n")
+        elif distance_to_center > 10:
+            # Line is to the right, so steer right
+            steer(255, 1)  # Right turn
+        elif distance_to_center < -10:
+            # Line is to the left, so steer left
+            steer(255, -1)  # Left turn
     else:
-        # Reset to center when no line is detected
-        servo_angle = 0
-        prev_servo_angle = 0
-
-        print(servo_angle)
-        uart.write(str(servo_angle) + "\n")
-        uart.write("x\n")
-
-
-def draw_blob_rectangle(blobs, img):
-    if blobs:
-        b = max(blobs, key=lambda x: x.pixels())  # Largest blob
-        if b.pixels() > 2000:
-            print(b)
-            e = img.width() / 2 - b.cx()
-            print(e)
-            img.draw_rectangle(b[0:4])
+        # No line detected, stop steering
+        stop_steering()
 
 # Initialize LCD and Camera
 lcd.init(freq=15000000)
@@ -161,34 +132,32 @@ led_state = 0
 last_toggle_time = utime.ticks_ms()
 led_pin = led_r  # Default LED
 
-should_follow_blob = True
+should_follow_line = True
+th = (0, 100, 12, 49, -8, 127)
 
 while True:
     clock.tick()
     img = sensor.snapshot()
 
-    th = (0, 100, 12, 49, -8, 127)
-    blobs = img.find_blobs([th])
-
     line = img.get_regression([th], area_threshold = 100)
-    follow_line(line, img, 5)
-
-    lcd.display(img)
+    follow_line(line, img)
 
     # command = check_input()
     # if command == "f":
-    #     should_follow_blob = True
+    #     should_follow_line = True
     # elif command == "s":
-    #     should_follow_blob = False
+    #     should_follow_line = False
     # elif command is not None:
     #     led_pin = command  # Update LED selection
 
-    #if should_follow_blob:
-    #    follow_blob(blobs, img)
-    #    draw_blob_rectangle(blobs, img)
+    #if should_follow_line:
+    #    line = img.get_regression([th], area_threshold = 100)
+    #    follow_line(line, img, 5)
 
     current_time = utime.ticks_ms()
     if utime.ticks_diff(current_time, last_toggle_time) > 500:
         led_state = not led_state
         led_pin.value(led_state)
         last_toggle_time = current_time
+
+    lcd.display(img)

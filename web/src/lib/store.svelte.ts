@@ -87,20 +87,20 @@ export function resetMqttStore() {
 }
 
 interface movement {
-  direction?: number,
-  steer?: number,
-  speed?: number,
-  steerAngle?: number,
+  driveDirection?: number,
+  steerDirection?: number,
+  driveSpeed?: number,
+  steerSpeed?: number,
 }
 
 export const movementData = $state<movement>({
-  direction: undefined,
-  steer: undefined,
-  speed: undefined,
-  steerAngle: undefined,
+  driveDirection: undefined,
+  steerDirection: undefined,
+  driveSpeed: undefined,
+  steerSpeed: undefined,
 })
 
-export const applicationLogs = $state({logs: [["Init", new Date()]]});
+export const applicationLogs = $state({logs: [["Init app", new Date()]]});
 
 export function logApplicationEvent(log: string): void {
   applicationLogs.logs.push([log, new Date()]);
