@@ -2,7 +2,7 @@
 #define MOTOR_CONTROL_H
 
 #include <Arduino.h>
-#include <Servo.h>
+// #include <Servo.h>
 
 // Define motor and servo pins, regular steering
 //#define MOTOR_PIN_RIGHT_DIR 5    // D1 (GPIO 5)

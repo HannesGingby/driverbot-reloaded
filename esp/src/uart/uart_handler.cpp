@@ -25,11 +25,12 @@ void followLine() {
   if (buffedString.length() > 0) {
       // Check for the forward and stop commands
       if (buffedString == "w") {
-          drive(255, true);
+          Serial.println("Driving forward");
+          drive(512, true);
       } else if (buffedString == "x") {
           stopMotors();
       } else if (buffedString == "z") {
-          // Implement stop steering if needed
+          stopMotors();
       }
       // Check for the steer command (format: t,<speed>,<direction>)
       else if (buffedString.startsWith("t,")) {
@@ -43,8 +44,10 @@ void followLine() {
 
               if (steerDirection == -1) {
                   steer(steerSpeed, false);
+                  Serial.println("Steering left");
               } else if (steerDirection == 1) {
                   steer(steerSpeed, true);
+                  Serial.println("Steering right");
               }
           }
       }

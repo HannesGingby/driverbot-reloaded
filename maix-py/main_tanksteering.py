@@ -27,6 +27,25 @@ fm.register(RX_PIN, fm.fpioa.UART1_RX, force=True)
 baud = 115200
 uart = UART(UART.UART1, baud, 8, None, 1, timeout=1000, read_buf_len=4096)
 
+# Initialize LCD and Camera
+lcd.init(freq=15000000)
+lcd.rotation(2)
+sensor.reset()
+sensor.set_pixformat(sensor.RGB565)
+sensor.set_framesize(sensor.QVGA)
+sensor.skip_frames(time=2000)
+
+clock = time.clock()
+
+led_state = 0
+last_toggle_time = utime.ticks_ms()
+led_pin = led_r  # Default LED
+
+should_follow_line = True
+#th = (0, 100, 12, 49, -8, 127)
+th = (0, 100, 25, 127, -27, 127)
+
+
 # Function to check UART input
 def check_input():
     global uart
@@ -60,28 +79,27 @@ def check_input():
             print("Invalid input:", buf)
     return None
 
+
 def p_controller(sp, pv, kp, p0):
     e = sp - pv
     output = kp * e + p0
 
     return output
 
-#def steer(speed, direction):
- #   if speed == 0:
-  #      uart.write("t" + str(speed)*2 + str(direction) + "\n")
-   # else:
-    #    uart.write("t" + str(speed) + str(direction) + "\n")
 
 def steer(speed, direction):
     # Format command as: t,<speed>,<direction>\n
     cmd = "t,{0},{1}\n".format(speed, direction)
     uart.write(cmd)
 
+
 def stop_motors():
     uart.write("x\n")
 
+
 def stop_steering():
     uart.write("z\n")
+
 
 def follow_line(line, img):
     if line:
@@ -89,51 +107,44 @@ def follow_line(line, img):
         img.draw_line(line.x1(), line.y1(), line.x2(), line.y2(), image.rgb_to_lab((0, 255, 0)))
 
         # Calculate normalized theta (0 is vertical, positive is right, negative is left)
-        theta = line.theta()
-        if theta > 90:
-            theta = 270 - theta
-        else:
-            theta = 90 - theta
+        #theta = line.theta()
+        #if theta > 90:
+        #    theta = 270 - theta
+        #else:
+        #    theta = 90 - theta
 
-        # Calculate line position relative to image center
-        x_center = img.width() / 2
-        line_center_x = (line.x1() + line.x2()) / 2
+        x_center = img.height() / 2  # Camera flipped
+        line_center_x = (line.y1() + line.y2()) / 2
         distance_to_center = x_center - line_center_x
 
-        # Determine steering logic
-        error = abs(distance_to_center)
+        # Calculate tilt
+        try:
+            k = (line.y2() - line.y1()) / (line.x2() - line.x1())
+        except ZeroDivisionError:
+            k = 0
 
-        if error <= 10:
-            # Line is centered or very close to center
-            stop_steering()
-            # Drive forward
-            uart.write("w\n")
-        elif distance_to_center > 10:
-            # Line is to the right, so steer right
-            steer(255, 1)  # Right turn
-        elif distance_to_center < -10:
-            # Line is to the left, so steer left
-            steer(255, -1)  # Left turn
+        if -80 <= distance_to_center <= 80:
+            if -0.08 <= k <= 0.08:
+                stop_motors()
+                uart.write("w\n")  # Drive forward
+                print("Driving forward")
+            elif k > 0.08:
+                steer(412, -1)  # Left turn
+                print("Turn left")
+            elif k < -0.08:
+                steer(412, 1)  # Right turn
+                print("Turn right")
+        elif distance_to_center > 80:
+            steer(412, 1)  # Right turn
+            print("Repositioning right")
+        elif distance_to_center < -80:
+            steer(412, -1)  # Left turn
+            print("Repositioning left")
     else:
         # No line detected, stop steering
-        stop_steering()
+        stop_motors()
+        print("No line detected, stopping mottors")
 
-# Initialize LCD and Camera
-lcd.init(freq=15000000)
-lcd.rotation(2)
-sensor.reset()
-sensor.set_pixformat(sensor.RGB565)
-sensor.set_framesize(sensor.QVGA)
-sensor.skip_frames(time=2000)
-
-clock = time.clock()
-
-led_state = 0
-last_toggle_time = utime.ticks_ms()
-led_pin = led_r  # Default LED
-
-should_follow_line = True
-th = (0, 100, 12, 49, -8, 127)
 
 while True:
     clock.tick()

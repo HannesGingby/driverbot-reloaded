@@ -1,6 +1,6 @@
 #include "motor_control.h"
 
-const int maxMotorSpeed = 255;
+const int maxMotorSpeed = 1024;
 bool isSteering = false;
 
 void drive(int speed, bool direction) {
@@ -44,6 +44,8 @@ void steer(int speed, bool direction) {
 }
 
 void stopMotors() {
+    isSteering = false;
+
     Serial.print("Stopping motors");
 
     analogWrite(MOTOR_1_SPEED_PIN, 0);
