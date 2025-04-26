@@ -3,6 +3,7 @@ from fpioa_manager import fm
 from Maix import GPIO
 import utime
 from machine import UART
+import KPU as kpu
 
 # Define LED and UART pins
 io_led_blue = 12
@@ -26,6 +27,30 @@ fm.register(RX_PIN, fm.fpioa.UART1_RX, force=True)
 
 baud = 115200
 uart = UART(UART.UART1, baud, 8, None, 1, timeout=1000, read_buf_len=4096)
+
+#task = kpu.load("/sd/road_classifier.kmodel")
+task = kpu.load(0x500000)
+kpu.set_outputs(task, 0, 1, 1, 7)
+labels = ['forward', 'intersection', 'left_right_t', 'left_turn', 'right_turn', 'straight_left', 'straight_right']
+
+# Initialize LCD and Camera
+lcd.init(freq=15000000)
+lcd.rotation(2)
+sensor.reset()
+sensor.set_pixformat(sensor.RGB565)
+sensor.set_framesize(sensor.QVGA)
+sensor.skip_frames(time=2000)
+
+clock = time.clock()
+
+led_state = 0
+last_toggle_time = utime.ticks_ms()
+led_pin = led_r  # Default LED
+
+should_follow_line = True
+#th = (0, 100, 12, 49, -8, 127)
+th = (0, 100, 25, 127, -27, 127)
+
 
 # Function to check UART input
 def check_input():
@@ -60,135 +85,147 @@ def check_input():
             print("Invalid input:", buf)
     return None
 
+
 def p_controller(sp, pv, kp, p0):
     e = sp - pv
     output = kp * e + p0
 
     return output
 
-def follow_blob(blobs, img, min_blob_pixel_size=2000):
-    if blobs:
-        b = max(blobs, key=lambda x: x.pixels())  # Find the largest blob
-        if b.pixels() > min_blob_pixel_size:
-            cx_value = b.cx()
-            center = img.width() / 2
 
-            correction = p_controller(center, cx_value, 0.5, 90)
-            servo_angle = max(0, min(180, int(correction)))
+def steer(speed_1, direction_1, speed_2, direction_2):
+    # Format command as t,<speed>,<direction>\n
+    cmd = "t,{0},{1},{2},{3}\n".format(speed_1, direction_1, speed_2, direction_2)
+    uart.write(cmd)
 
-            print(servo_angle)
-            uart.write(str(servo_angle) + "\n")
-            uart.write("w\n")
-        else:
-            uart.write("x\n")
 
-prev_servo_angle = 0
+def stop_motors():
+    uart.write("x\n")
 
-def follow_line(line, img, max_allowed_servo_change):
-    global prev_servo_angle
 
+def reverse():
+    uart.write("s\n")
+
+
+def p_controller(e, kp, p0):
+    output = kp * e + p0
+
+    return output
+
+
+def follow_line(line, img):
     if line:
         # Draw the detected line
         img.draw_line(line.x1(), line.y1(), line.x2(), line.y2(), image.rgb_to_lab((0, 255, 0)))
 
-        # Calculate normalized theta (0 is vertical, positive is right, negative is left)
-        theta = line.theta()
-        if theta > 90:
-            theta = 270 - theta
-        else:
-            theta = 90 - theta
-
-        # Calculate line position relative to image center
-        x_center = img.width() / 2
-        line_center_x = (line.x1() + line.x2()) / 2
+        x_center = img.height() / 2  # Camera flipped
+        line_center_x = (line.y1() + line.y2()) / 2
         distance_to_center = x_center - line_center_x
 
-        # Calculate desired servo output
-        servo_output = max(-90, min(90, int(distance_to_center * 0.5)))  # Scaled down for smoother response
+        deadzone_k_micro_adjust = 0.04
+        repositioning_deadzone = 80
 
-        # Smooth servo angle changes
-        degree_change = abs(servo_output - prev_servo_angle)
+        # Calculate tilt
+        try:
+            k = (line.y2() - line.y1()) / (line.x2() - line.x1())
+        except ZeroDivisionError:
+            k = 0
 
-        # Apply smooth servo angle transition
-        if degree_change > max_allowed_servo_change:
-            # Gradually move towards the target angle
-            if servo_output > prev_servo_angle:
-                servo_angle = prev_servo_angle + max_allowed_servo_change
-            else:
-                servo_angle = prev_servo_angle - max_allowed_servo_change
-        else:
-            # Use a weighted average for smoother transition
-            servo_angle = int(0.7 * prev_servo_angle + 0.3 * servo_output)
+        speed = p_controller(abs(k), 200, 400)
+        print("Speed:", speed)
 
-        # Update previous servo angle
-        prev_servo_angle = servo_angle
-
-        # Send servo command
-        print(servo_angle)
-        uart.write(str(servo_angle) + "\n")
-        uart.write("w\n")
-
+        if -repositioning_deadzone <= distance_to_center <= repositioning_deadzone:
+            if -deadzone_k_micro_adjust <= k <= deadzone_k_micro_adjust:
+                stop_motors()
+                uart.write("w\n")  # Drive forward
+                print("Driving forward")
+            elif k > deadzone_k_micro_adjust:
+                steer(speed, 1, 100, 1)  # Left turn
+                print("Turn left")
+            elif k < -deadzone_k_micro_adjust:
+                steer(100, 1, speed, 1)  # Right turn
+                print("Turn right")
+        elif distance_to_center > repositioning_deadzone:
+            steer(400, -1, 400, 1)  # Right turn
+            print("Repositioning right")
+        elif distance_to_center < -repositioning_deadzone:
+            steer(400, 1, 400, -1)  # Left turn
+            print("Repositioning left")
     else:
-        # Reset to center when no line is detected
-        servo_angle = 0
-        prev_servo_angle = 0
+        # No line detected
+        # stop_motors()
+        reverse()
+        print("No line detected, stopping mottors")
 
-        print(servo_angle)
-        uart.write(str(servo_angle) + "\n")
-        uart.write("x\n")
-
-
-def draw_blob_rectangle(blobs, img):
-    if blobs:
-        b = max(blobs, key=lambda x: x.pixels())  # Largest blob
-        if b.pixels() > 2000:
-            print(b)
-            e = img.width() / 2 - b.cx()
-            print(e)
-            img.draw_rectangle(b[0:4])
-
-# Initialize LCD and Camera
-lcd.init(freq=15000000)
-lcd.rotation(2)
-sensor.reset()
-sensor.set_pixformat(sensor.RGB565)
-sensor.set_framesize(sensor.QVGA)
-sensor.skip_frames(time=2000)
-
-clock = time.clock()
-
-led_state = 0
-last_toggle_time = utime.ticks_ms()
-led_pin = led_r  # Default LED
-
-should_follow_blob = True
 
 while True:
     clock.tick()
     img = sensor.snapshot()
 
-    th = (0, 100, 12, 49, -8, 127)
-    blobs = img.find_blobs([th])
-
     line = img.get_regression([th], area_threshold = 100)
-    follow_line(line, img, 5)
 
-    lcd.display(img)
+    if line:
+        #img_resized = img.resize(128, 128)  # Resize to match model input
+        #img_resized.pix_to_ai()             # Convert to KPU format
+        #fmap = kpu.forward(task, img_resized)
+
+
+        # img_hsv = img.to_rainbow()
+
+        # Create red mask - isolate red colors
+        # You may need to adjust these thresholds to match your OpenCV preprocessing
+        #red_mask = img_hsv.binary([(0, 30, 30, 255, 30, 255), (330, 360, 30, 255, 30, 255)])
+        red_mask = img.binary([(0, 100, 25, 127, -27, 127)])
+
+        # Resize to model input size (128x128)
+        red_mask = red_mask.resize(128, 128)
+
+        # Convert to RGB for the model
+        # Even though it's black and white, the model expects 3 channels
+        input_img = red_mask.to_rgb565()
+
+        # Convert to format for KPU
+        input_img.pix_to_ai()
+
+        # Run inference
+        fmap = kpu.forward(task, input_img)
+
+        # Get classification results
+        plist = fmap[:]
+        max_idx = plist.index(max(plist))
+        prediction = labels[max_idx]
+        print(prediction)
+
+    follow_line(line, img)
+
+
 
     # command = check_input()
     # if command == "f":
-    #     should_follow_blob = True
+    #     should_follow_line = True
     # elif command == "s":
-    #     should_follow_blob = False
+    #     should_follow_line = False
     # elif command is not None:
     #     led_pin = command  # Update LED selection
 
-    #if should_follow_blob:
-    #    follow_blob(blobs, img)
-    #    draw_blob_rectangle(blobs, img)
+    #if should_follow_line:
+    #    line = img.get_regression([th], area_threshold = 100)
+    #    follow_line(line, img, 5)
 
     current_time = utime.ticks_ms()
     if utime.ticks_diff(current_time, last_toggle_time) > 500:
         led_state = not led_state
         led_pin.value(led_state)
         last_toggle_time = current_time
+
+    if line:
+        img.draw_string(10, 10, "{} {:.2f}".format(prediction, max(plist)))
+
+    lcd.display(img)
+
+
+
+
+    time.sleep(0.5)
+
+KPU.deinit(task)

@@ -7,6 +7,9 @@ import pillow_heif
 root_path = "./data"
 output_root = "./data/preprocessed"
 
+# root_path = "./data/testing"
+# output_root = "./data/testing"
+
 def preprocess(img, output_path):
     # Convert to HSV for better color segmentation
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -44,20 +47,27 @@ def convert_heic_to_jpg(heic_path):
     )
     return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
 
-for dirpath, dirnames, filenames in os.walk(root_path):
-    for filename in filenames:
-        if filename.lower().endswith(".heic"):
-            file_path = os.path.join(dirpath, filename)
+def load_jpg(jpg_path):
+    return cv2.imread(jpg_path)
 
-            relative_path = os.path.relpath(dirpath, root_path)
-            output_dir = os.path.join(output_root, relative_path)
-            os.makedirs(output_dir, exist_ok=True)
+if __name__ == "__main__":
+  print("Preprocessing images...")
 
-            output_path = os.path.join(output_dir, filename.replace(".heic", ".jpg"))
+  for dirpath, dirnames, filenames in os.walk(root_path):
+      for filename in filenames:
+          if filename.lower().endswith(".jpg"):
+              file_path = os.path.join(dirpath, filename)
 
-            try:
-                img = convert_heic_to_jpg(file_path)
-                preprocess(img, output_path)
-                print(f"Processed and saved: {output_path}")
-            except Exception as e:
-                print(f"Failed to process {file_path}: {e}")
+              relative_path = os.path.relpath(dirpath, root_path)
+              output_dir = os.path.join(output_root, relative_path)
+              os.makedirs(output_dir, exist_ok=True)
+
+              output_path = os.path.join(output_dir, filename.replace(".jpg", ".jpg"))
+
+              try:
+                  #img = convert_heic_to_jpg(file_path)
+                  img = load_jpg(file_path)
+                  preprocess(img, output_path)
+                  print(f"Processed and saved: {output_path}")
+              except Exception as e:
+                  print(f"Failed to process {file_path}: {e}")

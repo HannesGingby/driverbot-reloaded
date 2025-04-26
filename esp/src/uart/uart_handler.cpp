@@ -26,67 +26,66 @@ void followLine() {
       // Check for the forward and stop commands
       if (buffedString == "w") {
           Serial.println("Driving forward");
-          drive(512, true);
+          drive(440, true);
+      } else if (buffedString == "s") {
+          Serial.println("Driving backward");
+          drive(440, false);
       } else if (buffedString == "x") {
           stopMotors();
       } else if (buffedString == "z") {
           stopMotors();
       }
-      // Check for the steer command (format: t,<speed>,<direction>)
+      // Check for the steer command (format: t,<speed1>,<direction1>,<speed2>,<direction2>)
       else if (buffedString.startsWith("t,")) {
-          int firstComma = buffedString.indexOf(',');
-          int secondComma = buffedString.indexOf(',', firstComma + 1);
-          if (firstComma != -1 && secondComma != -1) {
-              String speedStr = buffedString.substring(firstComma + 1, secondComma);
-              String dirStr = buffedString.substring(secondComma + 1);
-              int steerSpeed = speedStr.toInt();
-              int steerDirection = dirStr.toInt();  // Expected to be -1 or 1
+          // find indices of the four commas
+          int c1 = buffedString.indexOf(',');
+          int c2 = buffedString.indexOf(',', c1 + 1);
+          int c3 = buffedString.indexOf(',', c2 + 1);
+          int c4 = buffedString.indexOf(',', c3 + 1);
 
-              if (steerDirection == -1) {
-                  steer(steerSpeed, false);
-                  Serial.println("Steering left");
-              } else if (steerDirection == 1) {
-                  steer(steerSpeed, true);
-                  Serial.println("Steering right");
+          // make sure we got all four commas
+          if (c1 != -1 && c2 != -1 && c3 != -1 && c4 != -1) {
+              // extract each field
+              String speedStr1 = buffedString.substring(c1 + 1, c2);
+              String dirStr1   = buffedString.substring(c2 + 1, c3);
+              String speedStr2 = buffedString.substring(c3 + 1, c4);
+              String dirStr2   = buffedString.substring(c4 + 1);
+
+              // convert to integers
+              int speed1     = speedStr1.toInt();
+              int direction1 = dirStr1.toInt();   // expected -1 or 1
+              int speed2     = speedStr2.toInt();
+              int direction2 = dirStr2.toInt();   // expected -1 or 1
+
+              if (direction1 == 1 && direction2 == 1) {
+                analogWrite(MOTOR_1_SPEED_PIN, speed1);
+                digitalWrite(MOTOR_1_DIR_PIN, 1);
+
+                analogWrite(MOTOR_2_SPEED_PIN, speed2);
+                digitalWrite(MOTOR_2_DIR_PIN, 1);
+              } else if (direction1 == 1 && direction2 == -1) {
+                analogWrite(MOTOR_1_SPEED_PIN, speed1);
+                digitalWrite(MOTOR_1_DIR_PIN, 1);
+
+                analogWrite(MOTOR_2_SPEED_PIN, speed2);
+                digitalWrite(MOTOR_2_DIR_PIN, 0);
+              } else if (direction1 == -1 && direction2 == 1) {
+                analogWrite(MOTOR_1_SPEED_PIN, speed1);
+                digitalWrite(MOTOR_1_DIR_PIN, 0);
+
+                analogWrite(MOTOR_2_SPEED_PIN, speed2);
+                digitalWrite(MOTOR_2_DIR_PIN, 1);
+              } else if (direction1 == -1 && direction2 == -1) {
+                analogWrite(MOTOR_1_SPEED_PIN, speed1);
+                digitalWrite(MOTOR_1_DIR_PIN, 0);
+
+                analogWrite(MOTOR_2_SPEED_PIN, speed2);
+                digitalWrite(MOTOR_2_DIR_PIN, 0);
               }
           }
       }
   }
 }
-
-
-
-// void followLine() {
-//     String buffedString = "";
-
-//     // Read cx value from Maix
-//     while (serial.available()) {
-//         char buf = serial.read();
-
-//         if (buf == '\n') {
-//             break;  // Stop reading on \n
-//         }
-
-//         buffedString += buf;
-//     }
-
-//     if (buffedString.length() > 0) {
-//         if (buffedString == "w") {
-//             drive(255, true);
-//         } else if (buffedString == "x") {
-//             stopMotors();
-//         } else if (buffedString == "t") {
-//             int steerSpeed = buffedString.substring(1, 2).toInt();
-//             int steerDirection = buffedString.charAt(3);
-
-//             if (steerDirection == -1) {
-//               steer(steerSpeed, false);
-//             } else if (steerDirection == 1) {
-//               steer(steerSpeed, true);
-//             }
-//         }
-//     }
-// }
 
 void processUART() {
     followLine();
@@ -100,47 +99,3 @@ void maixLed() {
     serial.write("b\n");
     delay(1000);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-// void followLine() {
-//     String buffedString = "";
-
-//     // Read cx value from Maix
-//     while (serial.available()) {
-//         char buf = serial.read();
-
-//         if (buf == '\n') {
-//             break;  // Stop reading on \n
-//         }
-
-//         buffedString += buf;
-//     }
-
-//     if (buffedString.length() > 0) {
-//         if (buffedString == "w") {
-//             driveForward(255);
-//         } else if (buffedString == "x") {
-//             stopDriving();
-//         } else {
-//             int servoAngle = buffedString.toInt();
-//             if (servoAngle < 0) {
-//                 steerLeft(abs(servoAngle));
-//             } else if (servoAngle > 0) {
-//                 steerRight(abs(servoAngle));
-//             }
-//             // servoAngle = constrain(servoAngle, 0, 180);  // Ensure valid range
-//             // servo.write(servoAngle);
-//         }
-//     }
-// }

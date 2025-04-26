@@ -45,11 +45,7 @@ String espClientId = "esp8266-client-" + String(WiFi.macAddress());
 BearSSL::WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
-// Global JSON Variables (shared by MQTT and Motor Control)
-// String direction = "";
-// String steer = "";
-// int speedPercentage = 0;
-// int steerAngle = 0;
+// Global JSON variables
 int driveDirection = 0;   // 0 = stop, 1 = forward, -1 = backward
 int steerDirection = 0;   // 0 = stop, 1 = right, -1 = left
 int driveSpeedPercentage = 0;
@@ -136,11 +132,6 @@ void setup() {
     pinMode(MOTOR_1_SPEED_PIN, OUTPUT);
     pinMode(MOTOR_2_DIR_PIN, OUTPUT);
     pinMode(MOTOR_2_SPEED_PIN, OUTPUT);
-
-    //analogWrite(MOTOR_PIN_RIGHT_SPEED, 1);
-    //digitalWrite(MOTOR_PIN_RIGHT_DIR, 1);
-
-    // servo.attach(SERVO_PIN);
 
     // Set up SSL and MQTT client
     espClient.setTrustAnchors(new BearSSL::X509List(ca_cert));
