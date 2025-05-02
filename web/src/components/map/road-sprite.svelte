@@ -1,21 +1,18 @@
 <script lang="ts">
   import type { RoadTile } from "$lib/roads.svelte.js";
 
-  let { styles, tile}: { styles?: string, tile: RoadTile } = $props();
+  let { styles = "", tile}: { styles?: string, tile: RoadTile } = $props();
 </script>
 
-{#if tile.type === "forward"}
-  <p class={styles}>forward</p>
-{:else if tile.type === "intersection"}
-  <p class={styles}>intersection</p>
-{:else if tile.type === "leftRightT"}
-  <p class={styles}>leftRightT</p>
-{:else if tile.type === "leftTurn"}
-  <p class={styles}>leftTurn</p>
-{:else if tile.type === "rightTurn"}
-  <p class={styles}>rightTurn</p>
-{:else if tile.type === "straightLeft"}
-  <p class={styles}>straightLeft</p>
-{:else if tile.type === "straightRight"}
-  <p class={styles}>straightRight</p>
-{/if}
+<!-- <div class="absolute top-0 left-0 w-full h-full bg-amber-200">
+
+</div> -->
+<img
+  src={`/assets/road-tiles/${tile.type}.svg`}
+  alt={tile.type}
+  class={styles}
+  style="
+    max-width: unset !important;
+    transform: rotate({tile.rotation}deg);
+  "
+/>

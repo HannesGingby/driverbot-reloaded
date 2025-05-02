@@ -22,6 +22,7 @@ interface AuthStore {
   loggedIn: boolean;
   loginSuccess?: boolean;
   username: string;
+  userId?: string;
   mqttSuccess?: boolean;
   mqttError?: string;
   connectedToMQTT: boolean;
@@ -32,6 +33,7 @@ export const authStore = $state<AuthStore>({
   loggedIn: false,
   loginSuccess: undefined,
   username: "",
+  userId: "",
   mqttSuccess: undefined,
   mqttError: undefined,
   connectedToMQTT: false,
@@ -100,9 +102,9 @@ export const movementData = $state<movement>({
   steerSpeed: undefined,
 })
 
-export const applicationLogs = $state({logs: [["Init app", new Date()]]});
+export const applicationLogs = $state({logs: [["Init app", new Date(), false]]});
 
-export function logApplicationEvent(log: string): void {
-  applicationLogs.logs.push([log, new Date()]);
-  console.log(log);
+export function logApplicationEvent(log: string, isError: boolean = false): void {
+  applicationLogs.logs.push([log, new Date(), isError]);
+  isError ? console.error(log) : console.log(log);
 }

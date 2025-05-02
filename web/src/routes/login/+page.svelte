@@ -20,8 +20,8 @@
   import { authStore, mqttStore } from "$lib/store.svelte.js";
   import Account from "../../components/global/account.svelte";
 
-  function loginUser(username: string, password: string) {
-    const success = login(username, password);
+  async function loginUser(username: string, password: string) {
+    const success = await login(username, password);
 
     if (success) {
       authStore.loginSuccess = true;

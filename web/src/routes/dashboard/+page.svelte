@@ -7,6 +7,7 @@
   import CommandsSidebar from "../../components/commands-sidebar/commands-sidebar.svelte";
   import Map from "../../components/map/map.svelte";
   import Helpers from "../../components/helpers/helpers.svelte";
+  import ShortcutHelpers from "../../components/helpers/shortcut-helpers.svelte";
   import InfoSidebar from "../../components/info-sidebar/info-sidebar.svelte";
   import Bottombar from "../../components/bottombar/bottombar.svelte";
 
@@ -71,9 +72,10 @@
       <div id="gsap-left-right-opacity" style="width: {commandsSidebar.width}px;">
         <CommandsSidebar />
       </div>
-      <div id="gsap-fade-in" class="flex flex-col items-center relative w-[calc(100%-644px)]">
-        <Map styles="pt-12 pb-24 px-5 w-full h-full" />
+      <div id="gsap-fade-in" class="relative w-[calc(100%-644px)]">
+        <Map styles="pt-12 pb-24 px-5 h-full w-full" />
         <Helpers styles="w-full px-8 absolute bottom-6" />
+        <ShortcutHelpers styles="w-full px-8 absolute top-6" />
       </div>
       <div id="gsap-right-left-opacity" style="width: {infoSidebar.width}px;">
         <InfoSidebar />

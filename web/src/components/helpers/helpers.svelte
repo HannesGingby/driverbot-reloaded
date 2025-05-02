@@ -23,7 +23,7 @@
         iconHeight="17.5"
         text="Select"
         color="text-100"
-        textSize="12"
+        textSize={12}
       />
       <Action
         action={() => console.log("do something")}
@@ -31,7 +31,7 @@
         iconHeight="17.5"
         text="Pan"
         color="text-100"
-        textSize="12"
+        textSize={12}
         strokeWidth="1.5"
       />
     </div>

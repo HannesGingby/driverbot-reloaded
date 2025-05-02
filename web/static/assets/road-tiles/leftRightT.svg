@@ -1,0 +1,23 @@
+<svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_198_881)">
+<rect x="68" y="68" width="68" height="68" transform="rotate(-180 68 68)" fill="#262626"/>
+<line x1="63" y1="34" x2="5" y2="34" stroke="#3F3E3C" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 12"/>
+<line x1="65.5" y1="52.5" x2="2.5" y2="52.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="22" y1="9" x2="22" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="28" y1="9" x2="28" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="34" y1="9" x2="34" y2="3" stroke="#3F3E3C" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="40" y1="9" x2="40" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="46" y1="9" x2="46" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="65.5" y1="15.5" x2="54.5" y2="15.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="52.5" y1="13.5" x2="52.5" y2="2.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="15.5" y1="2.5" x2="15.5" y2="13.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="13.5" y1="15.5" x2="2.5" y2="15.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<path d="M14 14H17V15C17 16.1046 16.1046 17 15 17H14V14Z" fill="#64615D"/>
+<path d="M54 14L54 17L53 17C51.8954 17 51 16.1046 51 15L51 14L54 14Z" fill="#64615D"/>
+</g>
+<defs>
+<clipPath id="clip0_198_881">
+<rect width="68" height="68" fill="white" transform="translate(68 68) rotate(-180)"/>
+</clipPath>
+</defs>
+</svg>

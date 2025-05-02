@@ -1,0 +1,42 @@
+<svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_198_802)">
+<rect y="68" width="68" height="68" transform="rotate(-90 0 68)" fill="#262626"/>
+<line x1="22" y1="9" x2="22" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="28" y1="9" x2="28" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="34" y1="9" x2="34" y2="3" stroke="#3F3E3C" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="40" y1="9" x2="40" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="46" y1="9" x2="46" y2="3" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="59" y1="22" x2="65" y2="22" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="59" y1="28" x2="65" y2="28" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="59" y1="34" x2="65" y2="34" stroke="#3F3E3C" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="59" y1="40" x2="65" y2="40" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="59" y1="46" x2="65" y2="46" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="3" y1="22" x2="9" y2="22" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="3" y1="28" x2="9" y2="28" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="3" y1="34" x2="9" y2="34" stroke="#3F3E3C" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="3" y1="40" x2="9" y2="40" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="3" y1="46" x2="9" y2="46" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="22" y1="65" x2="22" y2="59" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="28" y1="65" x2="28" y2="59" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="34" y1="65" x2="34" y2="59" stroke="#3F3E3C" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="40" y1="65" x2="40" y2="59" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="46" y1="65" x2="46" y2="59" stroke="#64615D" stroke-width="4" stroke-linecap="square" stroke-dasharray="10 11"/>
+<line x1="65.5" y1="15.5" x2="54.5" y2="15.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="52.5" y1="13.5" x2="52.5" y2="2.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="52.5" y1="65.5" x2="52.5" y2="54.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="54.5" y1="52.5" x2="65.5" y2="52.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="2.5" y1="52.5" x2="13.5" y2="52.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="15.5" y1="54.5" x2="15.5" y2="65.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="15.5" y1="2.5" x2="15.5" y2="13.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<line x1="13.5" y1="15.5" x2="2.5" y2="15.5" stroke="#64615D" stroke-width="3" stroke-linecap="square" stroke-dasharray="1 5"/>
+<path d="M14 14H17V15C17 16.1046 16.1046 17 15 17H14V14Z" fill="#64615D"/>
+<path d="M54 14L54 17L53 17C51.8954 17 51 16.1046 51 15L51 14L54 14Z" fill="#64615D"/>
+<path d="M54 54L51 54L51 53C51 51.8954 51.8954 51 53 51L54 51L54 54Z" fill="#64615D"/>
+<path d="M14 54L14 51L15 51C16.1046 51 17 51.8954 17 53L17 54L14 54Z" fill="#64615D"/>
+</g>
+<defs>
+<clipPath id="clip0_198_802">
+<rect width="68" height="68" fill="white" transform="translate(0 68) rotate(-90)"/>
+</clipPath>
+</defs>
+</svg>

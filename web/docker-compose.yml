@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  pocketbase:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PB_VERSION: 0.27.2
+    container_name: pocketbase
+    hostname: localhost
+    restart: unless-stopped
+    ports:
+      - '8090:8090'
+    volumes:
+      - ./pb_data:/pb_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # frontend:
+  #   image: node:20-alpine
+  #   container_name: svelte-dev
+  #   restart: unless-stopped
+  #   working_dir: /app
+  #   ports:
+  #     - '5173:5173'
+  #   volumes:
+  #     - ./:/app
+  #     - /app/node_modules
+  #   command: >
+  #     sh -c "[ -f package-lock.json ] && npm ci || npm install &&
+  #            npm run dev -- --host 0.0.0.0"
+  #   depends_on:
+  #     pocketbase:
+  #       condition: service_healthy

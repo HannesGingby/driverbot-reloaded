@@ -55,7 +55,7 @@ export function connect(clusterURL: string, username: string, password: string) 
   });
 
   client.on('error', function (error : any) {
-    logApplicationEvent(error);
+    logApplicationEvent(error, true);
     authStore.mqttSuccess = false;
     authStore.mqttError = error;
   });

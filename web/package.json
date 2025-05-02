@@ -46,6 +46,7 @@
 	"dependencies": {
 		"gsap": "^3.12.7",
 		"lucide-svelte": "^0.475.0",
-		"mqtt": "^5.10.3"
+		"mqtt": "^5.10.3",
+		"pocketbase": "^0.26.0"
 	}
 }

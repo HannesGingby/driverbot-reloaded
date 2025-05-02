@@ -9,6 +9,10 @@
 	>
 	<div class="flex justify-between">
 		<p>{log[0]}</p>
-		<p class="text-text-200">{formatDateTime(log[1])}</p>
+    {#if log[2]}
+      <p class="text-bad">{formatDateTime(log[1])}</p>
+    {:else}
+      <p class="text-text-200">{formatDateTime(log[1])}</p>
+    {/if}
 	</div>
 </div>
