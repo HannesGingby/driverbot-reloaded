@@ -19,6 +19,5 @@ extern bool isSteering;
 void drive(int speed, bool direction);
 void steer(int speed, bool direction);
 void stopMotors();
-void stopSteering();
 
 #endif // MOTOR_CONTROL_H

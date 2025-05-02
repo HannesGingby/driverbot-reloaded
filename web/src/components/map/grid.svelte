@@ -2,6 +2,9 @@
   import { onMount } from "svelte";
   import { co } from "$lib/store.svelte.js";
   import { mapProperties } from "$lib/store.svelte.js";
+  import { roadTiles } from "$lib/roads.svelte.js";
+  import type { RoadTile } from "$lib/roads.svelte.js";
+  import RoadSprite from "./road-sprite.svelte";
 
   import SpinnerCircle from "../global/spinner-circle.svelte";
 
@@ -36,6 +39,19 @@
     const startX = -Math.floor(columnCount / 2);
     const startY = Math.floor((rowCount - 1) / 2);
     return [startX + col, startY - row];
+  }
+
+  function coordsToCell(x: number, y: number, rowCount: number, columnCount: number) {
+    const startX = -Math.floor(columnCount / 2);
+    const startY =  Math.floor((rowCount - 1) / 2);
+    const col = x - startX;
+    const row = startY - y;
+    return [row, col] as const;
+  }
+
+  function tileAt(row: number, col: number): RoadTile | undefined {
+    const [x,y] = getCoordinates(row, col);
+    return roadTiles.find(t => t.x === x && t.y === y);
   }
 
   function handleMouseMove(event: MouseEvent) {
@@ -89,6 +105,7 @@
     {#each Array(rowCount) as _, row}
       {#each Array(columnCount) as _, col}
         {@const [x, y] = getCoordinates(row, col)}
+        {@const tile = tileAt(row, col)}
         <div
           class="bg-grid rounded-full relative group cursor-default"
           style="
@@ -109,6 +126,12 @@
           >
             [{x}, {y}]
           </div>
+          {#if tile}
+            <RoadSprite
+              tile = {tile}
+              styles="absolute top-0 left-0 w-full h-full rotate-{tile.rotation} text-text-100 text-xs origin-center"
+            />
+          {/if}
         </div>
       {/each}
     {/each}

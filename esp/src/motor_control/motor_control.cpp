@@ -52,10 +52,4 @@ void stopMotors() {
     analogWrite(MOTOR_2_SPEED_PIN, 0);
     digitalWrite(MOTOR_1_DIR_PIN, 0);
     digitalWrite(MOTOR_2_DIR_PIN, 0);
-
-    // // If not steering, stop the motors
-    // if (!isSteering) {
-    //     analogWrite(MOTOR_1_SPEED_PIN, 0);
-    //     analogWrite(MOTOR_2_SPEED_PIN, 0);
-    // }
 }
