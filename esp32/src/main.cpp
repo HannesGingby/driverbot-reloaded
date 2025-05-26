@@ -109,6 +109,14 @@ int steerDirection = 0;   // 0 = stop, 1 = right, -1 = left
 int driveSpeedPercentage = 0;
 int steerSpeedPercentage = 0;
 
+String taskCommand = "";
+int startPosX = 0;
+int startPosY = 0;
+int mapSizeX = 0;
+int mapSizeY = 0;
+
+String currentRoadTile = "";
+
 
 void setupWifi() {
     delay(10);
@@ -380,6 +388,8 @@ void trackPosition() {
         y = positionTracker.getY();
         heading = positionTracker.getHeadingDegrees();
         Serial.printf("Position: (%.1f mm, %.1f mm) @ %.1f°\n", x, y, heading);
+
+        // sendEspData(x, y, heading, positionTracker.getTileX(), positionTracker.getTileY(), currentRoadTile);
     }
 }
 

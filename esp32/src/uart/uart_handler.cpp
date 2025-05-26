@@ -10,6 +10,8 @@ static uint8_t uartIdx = 0;
 static unsigned long lastByteTime = 0;
 static const unsigned long UART_TIMEOUT = 100; // ms
 
+extern String currentRoadTile;
+
 void setupUART() {
     UART.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
     UART.setTimeout(50); // Set timeout for UART operations
@@ -98,6 +100,8 @@ static void handleCommand(const char* cmd) {
         const char* tileStr = cmd + 2;
         Serial.printf("Received tile: %s\n", tileStr);
         // TODO: sync tile with MQTT
+
+        currentRoadTile = tileStr;
     }
     else {
         Serial.printf("Unknown command: %s\n", cmd);
@@ -118,7 +122,7 @@ void processUART() {
         char c = UART.read();
         lastByteTime = currentTime;
 
-        if (c == '\n' || c == '\r') {
+        if (c == '\n') {
             if (uartIdx > 0) {
                 uartBuf[uartIdx] = '\0';
                 handleCommand(uartBuf);
@@ -147,6 +151,19 @@ void sendPosition(int tileX, int tileY) {
         UART.flush(); // Ensure data is sent immediately
         delay(10); // Small delay to prevent overwhelming the receiver
     }
+}
+
+void sendCommand(String command, int startPosX, int startPosY, int mapSizeX, int mapSizeY) {
+    char msg[32];
+    int len = snprintf(msg, sizeof(msg), "c,%s,%d,%d,%d,%d\n", command.c_str(), startPosX, startPosY, mapSizeX, mapSizeY);
+    if (len > 0 && len < sizeof(msg)) {
+        UART.write((const uint8_t*)msg, len);
+        UART.flush(); // Ensure data is sent immediately
+        delay(10); // Small delay to prevent overwhelming the receiver
+    }
+
+    Serial.print("Sending command");
+    Serial.println(command);
 }
 
 void maixLed() {

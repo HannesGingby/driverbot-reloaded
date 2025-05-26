@@ -1,5 +1,6 @@
 #include "position_tracker.h"
 #include "../uart/uart_handler.h"
+#include "../mqtt/mqtt_handler.h"
 
 // For ±250 °/s full-scale, the MPU gives 131 LSB per °/s:
 static constexpr float GYRO_LSB_PER_DPS = 131.0f;
@@ -12,8 +13,8 @@ float MIN_HEADING_CHANGE = 0.0f * DPS_TO_RAD;
 int lastLeftDistance;
 int lastRightDistance;
 
-const int differenceLeftThreshold = 9;
-const int differenceRightThreshold = 7;
+const int differenceLeftThreshold = 12;
+const int differenceRightThreshold = 6;
 
 int prevLeftTicks;
 int prevRightTicks;
@@ -24,6 +25,8 @@ int prevRightTicks;
 float headingScale = 90.0f / 70.8f;
 // float headingScale = 90.0f / 68.0f;
 
+extern String currentRoadTile;
+
 PositionTracker::PositionTracker()
     : x(0.0), y(0.0), heading(0.0),
       leftTicks(0), rightTicks(0),
@@ -32,8 +35,8 @@ PositionTracker::PositionTracker()
       gyroIsCalibrated(false),
       calibSum(0), calibCount(0),
       tileX(0), tileY(0),
-      leftDetector(73, 79, 1),
-      rightDetector(36, 41, 1) {
+      leftDetector(74, 77, 1),
+      rightDetector(36, 39, 1) {
 }
 
 void PositionTracker::begin() {
@@ -198,9 +201,9 @@ void PositionTracker::processLeftDistance(int leftDistance) {
     unsigned long currentTime = millis();
 
     // Check for tick detection
-    // bool leftTickDetected = isTickDetectedWindow(leftDistance, true);
+    bool leftTickDetected = isTickDetectedWindow(leftDistance, true);
     // bool leftTickDetected = detectTick(leftDetector, leftDistance);
-    bool leftTickDetected = detectTickWindowed(leftDetector, leftWindow, leftDistance);
+    // bool leftTickDetected = detectTickWindowed(leftDetector, leftWindow, leftDistance);
 
     if (leftTickDetected) {
         leftTicks++;
@@ -217,9 +220,9 @@ void PositionTracker::processRightDistance(int rightDistance) {
     unsigned long currentTime = millis();
 
     // Check for tick detection
-    // bool rightTickDetected = isTickDetectedWindow(rightDistance, false);
+    bool rightTickDetected = isTickDetectedWindow(rightDistance, false);
     // bool rightTickDetected = detectTick(rightDetector, rightDistance);
-    bool rightTickDetected = detectTickWindowed(rightDetector, rightWindow, rightDistance);
+    // bool rightTickDetected = detectTickWindowed(rightDetector, rightWindow, rightDistance);
 
     if (rightTickDetected) {
         rightTicks++;
@@ -294,6 +297,7 @@ void PositionTracker::updatePosition(unsigned long currentTime) {
         Serial.printf("New tile: (%d, %d) at position (%.2f, %.2f)\n", tileX, tileY, x, y);
 
         sendPosition(tileX, tileY);
+        sendEspData(x, y, heading, positionTracker.getTileX(), positionTracker.getTileY(), currentRoadTile);
     }
 }
 

@@ -29,6 +29,7 @@ last_ms = utime.ticks_ms()
 tile_x = 0
 tile_y = 0
 
+mission_command = ""
 map_x_size = 10
 map_y_size = 5
 start_tile_x = 0
@@ -39,7 +40,7 @@ discovered = []   # Map
 should_follow = True
 road_buffer = []
 inference_queue = []
-model_interval = 30000  # ms
+model_interval = 1000  # ms
 
 # Line threshold
 th = (0, 100, 25, 127, -27, 127)
@@ -133,7 +134,7 @@ def process_uart():
 
 
 def process_uart():
-    global should_follow, tile_x, tile_y, uart_buffer, uart_busy, last_send_time
+    global should_follow, tile_x, tile_y, uart_buffer, uart_busy, last_send_time, mission_command, start_tile_x, start_tile_y, map_x_size, map_y_size
 
     # Don't read immediately after sending to avoid reading our own transmission
     if uart_busy and utime.ticks_diff(utime.ticks_ms(), last_send_time) < 50:
@@ -180,9 +181,9 @@ def process_uart():
             # Process the complete command
             print("Processing command:", repr(buf))
 
-            if buf == "f":
-                should_follow = True
-                print("Following enabled")
+            #if buf == "f":
+            #    should_follow = True
+            #    print("Following enabled")
             #elif buf == "r":
             #    led_r.value(1)
             #    print("Red LED on")
@@ -192,7 +193,7 @@ def process_uart():
             #elif buf == "b":
             #    led_b.value(1)
             #    print("Blue LED on")
-            elif buf.startswith("p,"):
+            if buf.startswith("p,"):
                 try:
                     # Clean up the command - remove any extra characters
                     clean_buf = buf.strip()
@@ -219,9 +220,42 @@ def process_uart():
                             print("Invalid position values: x='{}', y='{}'".format(x_str, y_str))
                     else:
                         print("Insufficient position parts: {}".format(len(parts)))
-
                 except (ValueError, IndexError) as e:
                     print("Error parsing position data: {} - '{}'".format(str(e), buf))
+            elif buf.startswith("c"):
+                try:
+                    # Clean up the command - remove any extra characters
+                    clean_buf = buf.strip()
+
+                    # Split by comma
+                    parts = clean_buf.split(',')
+
+                    # Ensure we have at least 6 parts: c, command, start_pos_x, start_pos_y, map_size_x, map_size_y
+                    if len(parts) >= 6:
+                        command_str = parts[1].strip()
+                        start_pos_x_str = parts[2].strip()
+                        start_pos_y_str = parts[3].strip()
+                        map_size_x_str = parts[4].strip()
+                        map_size_y_str = parts[5].strip()
+
+                        if command_str and start_pos_x_str and start_pos_y_str and map_size_x_str and map_size_y_str and start_pos_x_str.isdigit() and start_pos_y_str.isdigit() and map_size_x_str.isdigit() and map_size_y_str.isdigit():
+                            mission_command = command_str
+                            start_tile_x = int(start_pos_x_str)
+                            start_tile_y = int(start_pos_y_str)
+                            map_x_size = int(map_size_x_str)
+                            map_y_size = int(map_size_y_str)
+                            print("Got mission start: {}, {}, {}, {}, {}".format(mission_command, start_tile_x, start_tile_y, map_x_size, map_y_size))
+
+                            should_follow = False
+                            motors_stop()
+                            utime.sleep_ms(2000)
+                            should_follow = True
+                        else:
+                            print("Invalid task command values")
+                    else:
+                        print("Insufficient task command parts: {}".format(len(parts)))
+                except (ValueError, IndexError) as e:
+                    print("Error parsing task command data: {} - '{}'".format(str(e), buf))
             else:
                 print("Unknown command: '{}'".format(buf))
 
@@ -317,7 +351,7 @@ def motors_stop():
         uart.write("x\n")
         uart_busy = True
         last_send_time = utime.ticks_ms()
-        print("Stop")
+        #print("Stop")
     except Exception as e:
         print("UART write error:", str(e))
 
@@ -330,7 +364,7 @@ def motors_forward():
         uart.write("w\n")
         uart_busy = True
         last_send_time = utime.ticks_ms()
-        print("Forward")
+        #print("Forward")
     except Exception as e:
         print("UART write error:", str(e))
 
@@ -343,7 +377,7 @@ def motors_reverse():
         uart.write("s\n")
         uart_busy = True
         last_send_time = utime.ticks_ms()
-        print("Reverse")
+        #print("Reverse")
     except Exception as e:
         print("UART write error:", str(e))
 
@@ -378,13 +412,13 @@ def adjust_after_line(line, img):
         if abs(dist) <= rz:
             if abs(k) <= dz:
                 motors_forward()
-                print("Forward")
+                #print("Forward")
             elif k > dz:
                 motors_steer(150, 1, speed, 1)
-                print("Left")
+                #print("Left")
             else:
                 motors_steer(speed, 1, 150, 1)
-                print("Right")
+                #print("Right")
         else:
             if dist > rz:
                 motors_steer(200, 1, 200, 0)
@@ -393,7 +427,7 @@ def adjust_after_line(line, img):
                 motors_steer(200, 0, 200, 1)
                 print("Repositiong right")
     else:
-        print("No line found")
+        #print("No line found")
         motors_stop()
 
 
@@ -413,7 +447,7 @@ def model_callback(result):
                 idx = plist.index(max(plist))
                 prediction = labels[idx]
                 confidence = max(plist)
-                print("Prediction:", prediction, "confidence:", confidence)
+                #print("Prediction:", prediction, "confidence:", confidence)
                 shared_pred = prediction
                 shared_conf = confidence
             except Exception as e:

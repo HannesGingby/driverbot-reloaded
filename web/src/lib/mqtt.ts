@@ -2,6 +2,7 @@ import mqtt from "mqtt";
 
 import { routeToPage } from "./utils.js";
 import { authStore, mqttStore, movementData, logApplicationEvent, espData } from "./store.svelte.js";
+import { roadTiles } from "./roads.svelte.js";
 
 let client : any;
 let connectionTimeoutId : any;
@@ -67,7 +68,7 @@ export function connect(clusterURL: string, username: string, password: string) 
       logApplicationEvent("ESP Data: " + JSON.stringify(receivedEspData));
 
       // Handle data
-      const { x, y, heading, tileX, tileY, roadTile } = receivedEspData;
+      let { x, y, heading, tileX, tileY, roadTile } = receivedEspData;
 
       if (typeof x === "number") espData.x = x;
       if (typeof y === "number") espData.y = y;
@@ -75,6 +76,15 @@ export function connect(clusterURL: string, username: string, password: string) 
       if (typeof tileX === "number") espData.tileX = tileX;
       if (typeof tileY === "number") espData.tileY = tileY;
       if (roadTile !== undefined) espData.roadTile = roadTile;
+
+      // Snap heading to 0, 90, 180, 270
+      const snappedHeadings = [0, 90, 180, 270];
+      heading = snappedHeadings.reduce((prev, curr) =>
+        Math.abs(curr - heading) < Math.abs(prev - heading) ? curr : prev
+      );
+
+      // Update map
+      roadTiles.push({type: roadTile, rotation: heading, x: tileX, y: tileY});
     }
 
     if (topic === "ping") {
@@ -85,6 +95,7 @@ export function connect(clusterURL: string, username: string, password: string) 
   });
 
   client.subscribe('movement');
+  client.subscribe('task');
   client.subscribe('esp');
   client.subscribe('ping');
 

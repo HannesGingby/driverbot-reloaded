@@ -8,6 +8,6 @@
 // MQTT handling functions
 void connectMQTT();
 void mqttCallback(char* topic, byte* payload, unsigned int length);
-void sendEspData(float x = NAN, float y = NAN, float heading = NAN, int tileX = INT_MIN, int tileY = INT_MIN, const char* roadTile = nullptr);
+void sendEspData(float x = NAN, float y = NAN, float heading = NAN, int tileX = INT_MIN, int tileY = INT_MIN, const String roadTile = "");
 
 #endif // MQTT_HANDLER_H

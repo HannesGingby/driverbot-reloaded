@@ -9,6 +9,7 @@
 void setupUART();
 void processUART();
 void sendPosition(int tileX, int tileY);
+void sendCommand(String command, int startPosX, int startPosY, int mapSizeX, int mapSizeY);
 void maixLed();
 
 #endif // UART_HANDLER_H

@@ -17,6 +17,8 @@
 
   import { gsap } from "gsap";
 
+  import { sendMapUnknown } from "$lib/mqtt.js";
+
   let tooltip = $state("");
 
   let active = $state(true);
@@ -38,10 +40,10 @@
   let sPressed = $state(false);
   let dPressed = $state(false);
 
-  let mapSizeX = $state(null);
-  let mapSizeY = $state(null);
-  let startPosX = $state(null);
-  let startPosY = $state(null);
+  let mapSizeX = $state(0);
+  let mapSizeY = $state(0);
+  let startPosX = $state(0);
+  let startPosY = $state(0);
   // let startHeading = $state(0);
 
   import { commandsSidebar, movementData } from "$lib/store.svelte.js";
@@ -277,7 +279,7 @@
           </li>
         </ul>
         <div class="mb-8">
-          <Button action={() => console.log("do something")} text="Start" style="normal" confirm={false} />
+          <Button action={() => sendMapUnknown("start", startPosX, startPosY, mapSizeX, mapSizeY)} text="Start" style="normal" confirm={false} />
         </div>
       </div>
     {:else if mapKnownActive}

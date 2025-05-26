@@ -2,6 +2,9 @@
   import Coordinates from "./coordinates.svelte";
   import Action from "../global/action.svelte";
   import Zoom from "./zoom.svelte";
+  import Button from "../global/button.svelte";
+
+  import { roadTiles } from "$lib/roads.svelte.js";
 
   import SquareDashed from "lucide-svelte/icons/square-dashed";
   import Hand from "lucide-svelte/icons/hand";
@@ -34,6 +37,7 @@
         textSize={12}
         strokeWidth="1.5"
       />
+      <Button action={() => roadTiles.length = 0} text="Clear" style="normal" confirm={false} />
     </div>
     <div class="flex justify-end">
       <Zoom />

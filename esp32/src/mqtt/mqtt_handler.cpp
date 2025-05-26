@@ -4,6 +4,8 @@
 
 #include "../credentials.h"
 
+#include "../uart/uart_handler.h"
+
 #include <cmath>  // For NAN
 #include <limits.h> // For INT_MIN
 
@@ -16,11 +18,17 @@ extern int steerDirection;
 extern int driveSpeedPercentage;
 extern int steerSpeedPercentage;
 
+extern String taskCommand;
+extern int startPosX;
+extern int startPosY;
+extern int mapSizeX;
+extern int mapSizeY;
+
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-    Serial.println("Message arrived [");
+    Serial.print("Message arrived [");
     Serial.print(topic);
-    Serial.print("] ");
+    Serial.println("] ");
 
     if (strcmp(topic, "movement") == 0) {
         DynamicJsonDocument doc(512);
@@ -72,11 +80,37 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         if (driveDirection == 0 && steerDirection == 0) {
             stopMotors();   // Stop
         }
-    }
+    // } else if (strcmp(topic, "ping") == 0) {
+    //     Serial.println("Ping message received, sending response");
+    //     client.publish("ping", "1");
+    } else if (strcmp(topic, "task") == 0) {
+        Serial.println("Task message received");
 
-    if (strcmp(topic, "ping") == 0) {
-        Serial.println("Ping message received, sending response");
-        client.publish("ping", "1");
+        // Parse the json task payload
+        DynamicJsonDocument doc(512);
+        deserializeJson(doc, payload, length);
+
+        if (doc.containsKey("command")) {
+            taskCommand = doc["command"].as<String>();
+        }
+
+        if (doc.containsKey("startPosX")) {
+            startPosX = doc["startPosX"].as<int>();
+        }
+
+        if (doc.containsKey("startPosY")) {
+            startPosY = doc["startPosY"].as<int>();
+        }
+
+        if (doc.containsKey("mapSizeX")) {
+            mapSizeX = doc["mapSizeX"].as<int>();
+        }
+
+        if (doc.containsKey("mapSizeY")) {
+            mapSizeY = doc["mapSizeY"].as<int>();
+        }
+
+        sendCommand(taskCommand, startPosX, startPosY, mapSizeX, mapSizeY);
     }
 }
 
@@ -101,7 +135,8 @@ void connectMQTT() {
             Serial.println("Connected to MQTT broker");
             client.subscribe("movement");
             client.subscribe("ping");
-            sendEspData();
+            client.subscribe("task");
+            client.subscribe("esp");
         } else {
             Serial.print("failed, rc = ");
             Serial.print(client.state());
@@ -112,7 +147,7 @@ void connectMQTT() {
 }
 
 
-void sendEspData(float x, float y, float heading, int tileX, int tileY, const char* roadTile) {
+void sendEspData(float x, float y, float heading, int tileX, int tileY, const String roadTile) {
     DynamicJsonDocument doc(256);
 
     // Add optional position data if provided
@@ -125,11 +160,15 @@ void sendEspData(float x, float y, float heading, int tileX, int tileY, const ch
     if (tileY != INT_MIN) doc["tileY"] = tileY;
 
     // Add optional road tile type if provided
-    if (roadTile != nullptr) doc["roadTile"] = roadTile;
+    if (roadTile != "") doc["roadTile"] = roadTile;
 
     char buffer[256];
     size_t n = serializeJson(doc, buffer);
     buffer[n] = '\0';
+
+    Serial.print("Sending ESP data: ");
+    Serial.println(buffer);
+
     client.publish("esp", buffer, n);
 }
 
