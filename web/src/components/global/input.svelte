@@ -5,7 +5,7 @@
     Icon,
     inputValue = $bindable(),
     iconToggle = false,
-    ToggleIcon,
+    ToggleIcon = null,
   } = $props();
 
   let toggle = $state(false);

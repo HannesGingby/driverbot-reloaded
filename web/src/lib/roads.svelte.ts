@@ -1,4 +1,4 @@
-export type RoadType = "forward" | "intersection" | "leftRightT" | "leftTurn" | "rightTurn" | "straightLeft" | "straightRight";
+export type RoadType = "forward" | "intersection" | "left_right_t" | "left_turn" | "right_turn" | "straight_left" | "straight_right";
 
 export interface RoadTile {
   type: RoadType;
@@ -12,5 +12,5 @@ export const roadTiles = $state<RoadTile[]>([
   { type: "forward", rotation: 0, x:  1, y:  0 },  // horizontal
   { type: "intersection", rotation: 0, x: 2, y: 0 },
   { type: "forward", rotation:90, x:  2, y: 1 },
-  { type: "leftTurn", rotation:0, x:  2, y: 2 },
+  { type: "left_turn", rotation:0, x:  2, y: 2 },
 ]);

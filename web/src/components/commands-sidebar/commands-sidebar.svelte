@@ -4,6 +4,7 @@
   import HLine from "../global/h-line.svelte";
   import WasdButton from "./freedrive/wasd-button.svelte";
   import RangeInput from "./freedrive/range-input.svelte";
+  import Input from "../global/input.svelte";
 
   import GitBranch from "lucide-svelte/icons/git-branch";
   import Box from "lucide-svelte/icons/box";
@@ -12,6 +13,7 @@
   import PanelLeftClose from "lucide-svelte/icons/panel-left-close";
   import PanelLeftOpen from "lucide-svelte/icons/panel-left-open";
   import MoveLeft from "lucide-svelte/icons/move-left";
+  import Pen from "lucide-svelte/icons/pen";
 
   import { gsap } from "gsap";
 
@@ -19,11 +21,14 @@
 
   let active = $state(true);
   let freedriveActive = $state(false);
+  let mapUnknownActive = $state(false);
+  let mapKnownActive = $state(false);
+  let mapManualActive = $state(false);
 
   $effect(() => {
-    if (freedriveActive) {
+    if (freedriveActive || mapUnknownActive || mapKnownActive || mapManualActive) {
       gsap.fromTo("#gsap-command-tab", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power1.out" });
-    } else if (!freedriveActive) {
+    } else if (!freedriveActive && !mapUnknownActive && !mapKnownActive && !mapManualActive) {
       gsap.fromTo("#gsap-commands-menu", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power1.out" });
     }
   })
@@ -33,15 +38,25 @@
   let sPressed = $state(false);
   let dPressed = $state(false);
 
+  let mapSizeX = $state(null);
+  let mapSizeY = $state(null);
+  let startPosX = $state(null);
+  let startPosY = $state(null);
+  // let startHeading = $state(0);
+
   import { commandsSidebar, movementData } from "$lib/store.svelte.js";
   import { sendMovement } from "$lib/mqtt.js";
   import { onMount } from "svelte";
+  import Button from "../global/button.svelte";
 
   const mapCommands = [
     {
       label: "Map unknown",
       tooltip: "Map out an unknown map.",
-      action: () => console.log("do something"),
+      action: () => {
+        mapUnknownActive = true;
+        tooltip = "";
+      },
       Icon: GitBranch,
       Svg: Polygon,
       svgColor: "var(--color-primary)",
@@ -49,7 +64,10 @@
     {
       label: "Map known",
       tooltip: "Map out a known map.",
-      action: () => console.log("do something"),
+      action: () => {
+        mapKnownActive = true;
+        tooltip = "";
+      },
       Icon: Box,
       Svg: Polygon,
       svgColor: "var(--color-secondary)",
@@ -57,7 +75,10 @@
     {
       label: "Map manual",
       tooltip: "Map out a map manually by driving the car.",
-      action: () => console.log("do something"),
+      action: () => {
+        mapManualActive = true;
+        tooltip = "";
+      },
       Icon: Brain,
       Svg: Polygon,
       svgColor: "var(--color-bg-600)",
@@ -123,6 +144,30 @@
 
     setTimeout(() => {
       freedriveActive = false;
+    }, 200);
+  }
+
+  function handleMapUnknownBack() {
+    gsap.fromTo("#gsap-command-tab", { opacity: 1, x: 0 }, { opacity: 0, x: -20, duration: 0.4, ease: "power1.out" });
+
+    setTimeout(() => {
+      mapUnknownActive = false;
+    }, 200);
+  }
+
+  function handleMapKnownBack() {
+    gsap.fromTo("#gsap-command-tab", { opacity: 1, x: 0 }, { opacity: 0, x: -20, duration: 0.4, ease: "power1.out" });
+
+    setTimeout(() => {
+      mapKnownActive = false;
+    }, 200);
+  }
+
+  function handleMapManualBack() {
+    gsap.fromTo("#gsap-command-tab", { opacity: 1, x: 0 }, { opacity: 0, x: -20, duration: 0.4, ease: "power1.out" });
+
+    setTimeout(() => {
+      mapManualActive = false;
     }, 200);
   }
 
@@ -207,6 +252,50 @@
           <h1 class="text-lg mb-5 font-bold">Steer speed</h1>
           <p class="mb-1">{movementData.steerSpeed}%</p>
           <RangeInput bind:value={movementData.steerSpeed} onchange={sendMovement} name="steerSpeed" min="0" max="100" step="10" />
+        </div>
+      </div>
+    {:else if mapUnknownActive}
+      <div id="gsap-command-tab">
+        <div class="flex items-center mb-8">
+          <button onclick={handleMapUnknownBack} class="cursor-pointer">
+            <MoveLeft class="pb-5" size="48" onmouseenter={() => (tooltip = "Back")} onmouseleave={() => (tooltip = "")} />
+          </button>
+          <h1 class="text-lg mb-5 font-bold">Map unknown</h1>
+        </div>
+        <ul class="flex flex-col gap-[14px] mb-[52px]">
+          <li class="flex items-center gap-2">
+            <Input placeholder="Start pos x" bind:inputValue={startPosX} Icon={Pen} />
+          </li>
+          <li class="flex items-center gap-2">
+            <Input placeholder="Start pos y" bind:inputValue={startPosY} Icon={Pen} />
+          </li>
+          <li class="flex items-center gap-2">
+            <Input placeholder="Map size x" bind:inputValue={mapSizeX} Icon={Pen} />
+          </li>
+          <li class="flex items-center gap-2">
+            <Input placeholder="Map size y" bind:inputValue={mapSizeY} Icon={Pen} />
+          </li>
+        </ul>
+        <div class="mb-8">
+          <Button action={() => console.log("do something")} text="Start" style="normal" confirm={false} />
+        </div>
+      </div>
+    {:else if mapKnownActive}
+      <div id="gsap-command-tab">
+        <div class="flex items-center mb-8">
+          <button onclick={handleMapKnownBack} class="cursor-pointer">
+            <MoveLeft class="pb-5" size="48" onmouseenter={() => (tooltip = "Back")} onmouseleave={() => (tooltip = "")} />
+          </button>
+          <h1 class="text-lg mb-5 font-bold">Map known</h1>
+        </div>
+      </div>
+    {:else if mapManualActive}
+      <div id="gsap-command-tab">
+        <div class="flex items-center mb-8">
+          <button onclick={handleMapManualBack} class="cursor-pointer">
+            <MoveLeft class="pb-5" size="48" onmouseenter={() => (tooltip = "Back")} onmouseleave={() => (tooltip = "")} />
+          </button>
+          <h1 class="text-lg mb-5 font-bold">Map manual</h1>
         </div>
       </div>
     {:else}

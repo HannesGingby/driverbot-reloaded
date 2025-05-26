@@ -1,7 +1,7 @@
 import mqtt from "mqtt";
 
 import { routeToPage } from "./utils.js";
-import { authStore, mqttStore, movementData, logApplicationEvent } from "./store.svelte.js";
+import { authStore, mqttStore, movementData, logApplicationEvent, espData } from "./store.svelte.js";
 
 let client : any;
 let connectionTimeoutId : any;
@@ -63,8 +63,18 @@ export function connect(clusterURL: string, username: string, password: string) 
   client.on('message', function (topic: string, message : any) {
     if (topic == "esp") {
       // Parse JSON data
-      let recievedEspData = JSON.parse(message);
-      logApplicationEvent("ESP Data: " + recievedEspData.toString());
+      let receivedEspData = JSON.parse(message);
+      logApplicationEvent("ESP Data: " + JSON.stringify(receivedEspData));
+
+      // Handle data
+      const { x, y, heading, tileX, tileY, roadTile } = receivedEspData;
+
+      if (typeof x === "number") espData.x = x;
+      if (typeof y === "number") espData.y = y;
+      if (typeof heading === "number") espData.heading = heading;
+      if (typeof tileX === "number") espData.tileX = tileX;
+      if (typeof tileY === "number") espData.tileY = tileY;
+      if (roadTile !== undefined) espData.roadTile = roadTile;
     }
 
     if (topic === "ping") {
@@ -106,6 +116,21 @@ export function sendMovement() {
     client.publish('movement', jsonMovement);
     mqttStore.latestMovementSend = jsonMovement;
   }
+}
+
+export function sendMapUnknown(command: string, startPosX: number, startPosY: number, mapSizeX: number, mapSizeY: number) {
+  logApplicationEvent("Sending MQTT task command: " + command);
+
+  // Send json data
+  const jsonData = {
+    command: command,
+    startPosX: startPosX,
+    startPosY: startPosY,
+    mapSizeX: mapSizeX,
+    mapSizeY: mapSizeY,
+  };
+
+  client.publish('task', JSON.stringify(jsonData));
 }
 
 // Disconnect from the broker

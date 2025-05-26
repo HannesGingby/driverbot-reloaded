@@ -13,6 +13,7 @@ extern int steerDirection;
 extern int driveSpeedPercentage;
 extern int steerSpeedPercentage;
 
+
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
     Serial.println("Message arrived [");
     Serial.print(topic);
@@ -83,6 +84,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     */
 }
 
+
 void connectMQTT() {
     while (!client.connected()) {
         Serial.print("Attempting MQTT connection…");
@@ -112,6 +114,7 @@ void connectMQTT() {
         }
     }
 }
+
 
 void sendEspData() {
     // Now send a simple status message instead of position data.

@@ -1,3 +1,5 @@
+import type { RoadType } from "./roads.svelte.js";
+
 export const theme = $state({
   lightMode: false,
 });
@@ -100,6 +102,24 @@ export const movementData = $state<movement>({
   steerDirection: undefined,
   driveSpeed: undefined,
   steerSpeed: undefined,
+})
+
+interface espData {
+  x: number,
+  y: number,
+  heading: number,
+  tileX: number,
+  tileY: number,
+  roadTile?: RoadType,
+}
+
+export const espData = $state<espData>({
+  x: 0,
+  y: 0,
+  heading: 0,
+  tileX: 0,
+  tileY: 0,
+  roadTile: undefined,
 })
 
 export const applicationLogs = $state({logs: [["Init app", new Date(), false]]});

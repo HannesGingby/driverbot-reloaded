@@ -3,6 +3,7 @@
 const int maxMotorSpeed = 1024;
 bool isSteering = false;
 
+
 void drive(int speed, bool direction) {
     // direction = 1, forward
     // direction = 0, backward
@@ -25,6 +26,7 @@ void drive(int speed, bool direction) {
     }
 }
 
+
 void steer(int speed, bool direction) {
     // direction = 1, right
     // direction = 0, left
@@ -42,6 +44,7 @@ void steer(int speed, bool direction) {
     analogWrite(MOTOR_2_SPEED_PIN, speed);
     digitalWrite(MOTOR_2_DIR_PIN, direction);
 }
+
 
 void stopMotors() {
     isSteering = false;
