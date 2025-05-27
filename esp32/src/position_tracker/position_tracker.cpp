@@ -233,6 +233,20 @@ void PositionTracker::processRightDistance(int rightDistance) {
     lastUpdateTime = currentTime;
 }
 
+float getAdjustedDistancePerTick() const {
+    // Adjust based on tile type
+    if (currentRoadTile == "straight") {
+        return baseDistancePerTick * 1.0f;
+    } else if (currentRoadTile == "left_turn") {
+        return baseDistancePerTick * 0.8f;  // Turning is slower
+    } else if (currentRoadTile == "right_turn") {
+        return baseDistancePerTick * 0.8f;  // Turning is slower
+    } else {
+        return baseDistancePerTick;  // default
+    }
+}
+
+
 void PositionTracker::updatePosition(unsigned long currentTime) {
     // Serial.println("Updating position");
 
@@ -246,8 +260,10 @@ void PositionTracker::updatePosition(unsigned long currentTime) {
       return; // No movement
     }
 
-    float dL = dLT * DISTANCE_PER_TICK;
-    float dR = dRT * DISTANCE_PER_TICK;
+    float dpt = getAdjustedDistancePerTick();  // dynamic distance per tick
+    float dL = dLT * dpt;
+    float dR = dRT * dpt;
+
 
     // // Time-weighted position update
     // static unsigned long lastPositionUpdate = 0;

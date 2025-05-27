@@ -60,7 +60,8 @@ private:
     // Robot configuration constants
     static constexpr float WHEEL_BASE = 145.0;        // Distance between wheels in mm
     // static constexpr float DISTANCE_PER_TICK = 31;   // mm traveled per encoder tick
-    static constexpr float DISTANCE_PER_TICK = 31;   // mm traveled per encoder tick
+    float baseDistancePerTick = 31.0f;   // Default value
+
     // static constexpr float DISTANCE_PER_TICK = 30;   // mm traveled per encoder tick
 
     static constexpr float TILE_SIZE = 256.0;          // mm per tile
