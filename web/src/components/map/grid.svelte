@@ -38,7 +38,7 @@
   const EXTRA_ROW_COUNT = 1;
 
   const ORIGIN_X_OFFSET = -1;
-  const ORIGIN_Y_OFFSET = -1;
+  const ORIGIN_Y_OFFSET = 0;
 
   let originOffset = $state({ x: ORIGIN_X_OFFSET, y: ORIGIN_Y_OFFSET });
 
